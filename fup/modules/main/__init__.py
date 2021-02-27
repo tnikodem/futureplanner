@@ -1,0 +1,1 @@
+from fup.modules.main import environment, home, insurances, mobility, other, taxes, work
