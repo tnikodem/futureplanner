@@ -1,25 +1,29 @@
 import collections
 from fup.core.functions import get_full_name
+from fup.core.monitoring import Monitoring
+from fup.core.profiles import DefaultProfile
 
 
 class Manager:
     def __init__(self, config, module_list):
         self.config = config
 
+        # Globals
         self.year = config["start_year"]
+        self.money = config["start_money"]
+        self.total_income = 0  # at the end of year  # TODO rename to income
+        self.total_expenses = 0  # at the end of year
+
+        # Modules
         self.modules = collections.OrderedDict()
         for module in module_list:
             self.add_module(module)
 
-        # Money
-        self.total_income = 0
-        self.total_expenses = 0
-        self.money = config["start_money"]
+        # Monitoring to get summary for toy. Monitoring does NOT provide information for modules
+        self.monitoring = Monitoring(manager=self)
 
-        # TODO put into Monitoring
-        self.short_of_money = False
-        self.short_of_income = False
-        self.bancrupt = False
+        # Profile to provide information for modules about current situation of life
+        self.profile = DefaultProfile(config=config, manager=self)
 
     def add_module(self, module):
         self.modules[get_full_name(module)] = module(self)
@@ -36,13 +40,11 @@ class Manager:
 
         self.money = self.money + self.total_income - self.total_expenses
 
-        # TODO put this in the profiles
-        if self.total_income < 30000:
-            self.short_of_income = True
-        if self.money < 10000:
-            self.short_of_money = True
-        if self.money < 0:
-            self.bancrupt = True
+        self.profile.update()
+        self.monitoring.next_year()
+
+    def get_stats(self):
+        return self.monitoring.get_stats()
 
     def get_df_row(self):
         df_info = dict(year=self.year,

@@ -7,6 +7,12 @@ class Car(Module):
         self.expenses = manager.config["car_expenses"]
 
     def next_year(self):
-        inflation = self.get_prop("main.environment.Inflation", "inflation")
-        self.expenses *= inflation
+        total_inflation = self.get_prop("main.environment.Inflation", "total_inflation")
+        if self.profile.luxury_level == 0:
+            self.expenses = 0
+        elif self.profile.luxury_level == 1:
+            self.expenses = 0.5 * total_inflation * self.manager.config["car_expenses"]
+        else:
+            self.expenses = total_inflation * self.manager.config["car_expenses"]
+
         self.add_expenses(self.expenses)

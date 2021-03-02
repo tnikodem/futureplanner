@@ -1,7 +1,7 @@
 Future Planer
 =====
 
-Plan your future, now!
+Plan your future today!
 
 
 Installing

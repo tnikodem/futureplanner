@@ -5,7 +5,7 @@ from fup.core.module import Module
 class Taxes(Module):
     def __init__(self, manager):
         super().__init__(manager)
-        self.tax = 0
+        self.expenses = 0
         self.tax_rate = 0
 
         # freisteuer
@@ -15,12 +15,12 @@ class Taxes(Module):
         self.max_tax_rate = 0.42 + random.gauss(mu=0, sigma=0.03)
 
     def add_info(self, info):
-        info["tax"] = self.tax
+        info["tax"] = self.expenses
         info["tax_rate"] = self.tax_rate
 
     def next_year(self):
         inflation = self.get_prop("main.environment.Inflation", "inflation")
-        taxable_income = self.get_prop("main.work.Job", "income")
+        taxable_income = self.get_prop("main.work.Job", "income") + self.get_prop("main.work.Annuity", "income")
 
         self.tax_free_limit *= inflation
         self.max_tax_increase_limit *= inflation
@@ -33,6 +33,6 @@ class Taxes(Module):
             self.tax_rate = self.min_tax_rate + (taxable_income - self.tax_free_limit) * tax_increase
         self.tax_rate = min(self.tax_rate, self.max_tax_rate)
 
-        self.tax = self.tax_rate * taxable_income
+        self.expenses = self.tax_rate * taxable_income
 
-        self.add_expenses(self.tax)
+        self.add_expenses(self.expenses)

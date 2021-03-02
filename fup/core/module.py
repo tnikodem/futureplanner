@@ -1,5 +1,3 @@
-
-
 class Module:
     def __init__(self, manager=None):
         self.manager = manager
@@ -16,6 +14,10 @@ class Module:
     @property
     def config(self):
         return self.manager.config
+
+    @property
+    def profile(self):
+        return self.manager.profile
 
     def get_prop_setter(self, module_name, prop):
         if module_name not in self.modifies_modules:
