@@ -1,8 +1,8 @@
 import random
-from fup.core.module import Module
+from fup.core.module import ChangeModule
 
 
-class Taxes(Module):
+class Taxes(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         self.expenses = 0

@@ -1,8 +1,8 @@
 import random
-from fup.core.module import Module
+from fup.core.module import ChangeModule
 
 
-class InsuranceHealth(Module):
+class InsuranceHealth(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         # Module props
@@ -16,7 +16,7 @@ class InsuranceHealth(Module):
         self.add_expenses(self.expenses)
 
 
-class InsuranceNursingCare(Module):
+class InsuranceNursingCare(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         # Module props
@@ -35,7 +35,7 @@ class InsuranceNursingCare(Module):
         self.add_expenses(self.expenses)
 
 
-class InsurancePension(Module):
+class InsurancePension(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         self.income = 0
@@ -88,7 +88,7 @@ class InsurancePension(Module):
         self.add_expenses(self.expenses)
 
 
-class InsuranceUnemployment(Module):
+class InsuranceUnemployment(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         # Module props

@@ -10,7 +10,6 @@ class Manager:
 
         # Globals
         self.year = config["start_year"]
-        self.money = config["start_money"]
         self.income = config["start_income"]
         self.expenses = config["start_expenses"]
 
@@ -44,7 +43,7 @@ class Manager:
         for module_name in self.modules:
             self.modules[module_name].next_year()
 
-        self.money = self.money + self.income - self.expenses
+        self.get_module("main.assets.Money").count += self.income - self.expenses
 
         self.profile.update()
         self.monitoring.next_year()
@@ -55,8 +54,7 @@ class Manager:
     def get_df_row(self):
         info_dict = dict(year=self.year,
                          income=self.income,
-                         expenses=self.expenses,
-                         money=self.money)
+                         expenses=self.expenses)
         for module in self.modules:
             self.get_module(module).add_info(info_dict)
         self.profile.add_info(info_dict)

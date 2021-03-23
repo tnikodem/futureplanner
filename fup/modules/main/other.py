@@ -1,7 +1,7 @@
-from fup.core.module import Module
+from fup.core.module import ChangeModule
 
 
-class OtherExpenses(Module):
+class OtherExpenses(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         self.expenses = manager.config["other_expenses"]
@@ -12,7 +12,7 @@ class OtherExpenses(Module):
         self.add_expenses(self.expenses)
 
 
-class LuxuryExpenses(Module):
+class LuxuryExpenses(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         self.expenses = manager.config["other_expenses"]

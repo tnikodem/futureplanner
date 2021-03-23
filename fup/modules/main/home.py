@@ -1,8 +1,8 @@
 import random
-from fup.core.module import Module
+from fup.core.module import ChangeModule
 
 
-class Flat(Module):
+class Flat(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
         self.expenses = manager.config["flat_expenses"]

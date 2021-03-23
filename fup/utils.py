@@ -33,7 +33,7 @@ def get_module_list(config):
     except nx.NetworkXNoCycle:
         pass
 
-        # add root dependencies
+    # add root dependencies
     for node in G.nodes():
         if node == "root":
             continue
@@ -94,7 +94,6 @@ def run_toys(config, runs=100, profile_class=None, monitoring_class=None, debug=
             df_rows += [manager.get_df_row()]
         df = pd.DataFrame(df_rows)
 
-        # Plot modifications
         # tax correction
         df["expenses_net"] = df["expenses"] - df["tax"] - df["insurances"]
         df["income_net"] = df["income"] - df["tax"] - df["insurances"]

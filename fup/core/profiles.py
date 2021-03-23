@@ -15,6 +15,7 @@ class TestProfile:
     def update(self):
         self.retired = self.manager.year >= self.config["retirement_year"]
 
+
 class DefaultProfile:
     def __init__(self, manager, config):
         self.manager = manager
@@ -49,7 +50,8 @@ class DefaultProfile:
     # update once per year, or if necessary more often
     def update(self):
         # get values from modules
-        money = self.manager.money
+        money = self.manager.get_module("main.assets.Money").money_value \
+                + self.manager.get_module("main.assets.Stocks").money_value
         income = self.manager.income
         expenses = self.manager.expenses
         expected_pension = self.manager.get_module("main.insurances.InsurancePension").expected_income
