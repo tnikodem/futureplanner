@@ -50,8 +50,7 @@ class DefaultProfile:
     # update once per year, or if necessary more often
     def update(self):
         # get values from modules
-        money = self.manager.get_module("main.assets.Money").money_value \
-                + self.manager.get_module("main.assets.Stocks").money_value
+        money = self.manager.total_assets
         income = self.manager.income
         expenses = self.manager.expenses
         expected_pension = self.manager.get_module("main.insurances.InsurancePension").expected_income
@@ -75,7 +74,7 @@ class DefaultProfile:
         # before retirement
         money_at_retirement = money
         for i in range(years_till_retirement):
-            money_at_retirement /= inflation
+            money_at_retirement /= inflation  # TODO also add interest
             money_at_retirement += income - expenses  # assume income and expenses stay the same until retirement
 
         # after retirement
@@ -89,7 +88,7 @@ class DefaultProfile:
         taxrate_retired = 0.89
         income_wo_tax = (expected_pension * insurancerate_retired) * taxrate_retired
         for i in range(years_in_retirenment):
-            money_at_retirement /= inflation
+            money_at_retirement /= inflation  # TODO also add interest
             money_at_retirement += income_wo_tax - expenses_wo_tax
 
         # print(f"""{self.retired} {self.years_count}: +{int(income_wo_tax)} -{int(expenses_wo_tax)}: {int(self.manager.money)} -> {int(money_at_retirement)} ({self.money_level})""")
@@ -105,7 +104,7 @@ class DefaultProfile:
             self.money_level -= 3
         elif money_at_retirement < self.config["desired_money_buffer"]:
             self.money_level -= 1
-        self.money_level = min(1000, self.money_level)
+        self.money_level = min(10, self.money_level)
         self.money_level = max(-10, self.money_level)
 
         if self.manager.year == self.config["retirement_year"]:  # reset at begin of retirement

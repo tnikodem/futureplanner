@@ -48,6 +48,19 @@ class Manager:
         self.profile.update()
         self.monitoring.next_year()
 
+    def dependency_check(self):
+        for module_name in self.modules:
+            self.modules[module_name].dependency_check = True
+            self.modules[module_name].next_year()
+
+    @property
+    def total_assets(self):
+        total_assets = 0
+        for module_name in self.modules:
+            if hasattr(self.modules[module_name], 'money_value'):
+                total_assets += self.modules[module_name].money_value
+        return total_assets
+
     def get_stats(self):
         return self.monitoring.get_final_stats()
 

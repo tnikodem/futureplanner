@@ -12,7 +12,7 @@ def get_module_list(config):
 
     # dry run to get dependencies
     manager = Manager(config, module_list)
-    manager.next_year()
+    manager.dependency_check()
 
     G = nx.DiGraph()
     G.add_node("root")
@@ -46,6 +46,9 @@ def get_module_list(config):
     sorted_modules = []
     for module_name in dep_checked_list:
         sorted_modules += [m for m in module_list if get_full_name(m) == module_name]
+
+    # add end of year modules at the end
+    sorted_modules += [m for m in get_all_standard_modules() if get_full_name(m) in config["module_list_year_end"]]
 
     return sorted_modules
 
@@ -100,7 +103,7 @@ def run_toys(config, runs=100, profile_class=None, monitoring_class=None, debug=
         # Inflation corrected
         df["expenses_net_cor"] = df["expenses_net"] / df["total_inflation"]
         df["income_net_cor"] = df["income_net"] / df["total_inflation"]
-        df["money_cor"] = df["money"] / df["total_inflation"]
+        df["assets_cor"] = df["assets"] / df["total_inflation"]
 
         dfs += [df]
         stats += [manager.get_stats()]

@@ -11,7 +11,6 @@ class Money(AssetModule):
 
     def add_info(self, info_dict):
         info_dict["money"] = self.money_value
-        info_dict["estate"] = info_dict.get("estate", 0) + self.money_value
 
 
 class Stocks(AssetModule):
@@ -19,37 +18,81 @@ class Stocks(AssetModule):
         super().__init__(manager)
 
         self.count = manager.config["start_stocks"]
-        self.asset_value = manager.config["start_stock_value"]
-        self.mean_value_increase = 1.005
+        self.asset_value = 1
+        # S&P 500 since 1900
+        self.value_increase_mean = 0.038690  # TODO this is only price, add dividend
+        self.value_increase_std = 0.2
 
     def next_year(self):
-        inflation = self.get_prop("main.environment.Inflation", "inflation")
-        self.asset_value *= self.mean_value_increase * inflation
+        if self.config["random"]:
+            self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
+        else:
+            self.asset_value *= 1 + self.value_increase_mean
 
     def add_info(self, info_dict):
-        info_dict["estate"] = info_dict.get("estate", 0) + self.money_value
+        info_dict["stocks"] = self.money_value
+
+
+class SavingPlan(AssetModule):
+    # TODO add that money is immobile for 5+ years
+    def __init__(self, manager):
+        super().__init__(manager)
+
+        self.count = manager.config["start_saving_plan"]
+        self.asset_value = 1
+        self.mean_count_increase = 1.001
+
+    def next_year(self):
+        self.count *= self.mean_count_increase
+
+
+class Gold(AssetModule):
+    def __init__(self, manager):
+        super().__init__(manager)
+
+        self.count = manager.config["start_gold"]
+        # Gold price since since 1950
+        self.value_increase_mean = 0.076029
+        self.value_increase_std = 0.231742
+
+    def next_year(self):
+        if self.config["random"]:
+            self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
+        else:
+            self.asset_value *= 1 + self.value_increase_mean
+
+    def add_info(self, info_dict):
+        info_dict["gold"] = self.money_value
 
 
 class Investment(ChangeModule):
     def __init__(self, manager):
         super().__init__(manager)
+        self.assets_stock_ratio = manager.config["assets_stock_ratio"]
+        self.assets_gold_ratio = manager.config["assets_gold_ratio"]
 
     def next_year(self):
-        income = self.get_prop("main.work.Job", "income")
-        stock_money_value = self.get_prop("main.assets.Stocks", "money_value")
-        invest_stock = self.get_prop("main.assets.Stocks", "invest")
-        harvest_stock = self.get_prop("main.assets.Stocks", "harvest")
+        self.expenses = 0
+        total_assets = self.manager.total_assets
 
-        if income > 0:
-            # always 10% in stocks
-            invest_stock(income * 0.1)
-            self.expenses = income * 0.1
-            self.income = 0
-        else:
-            harvest_fation = 1 / 20  # always assume still 20 years
-            harvest_stock(harvest_fation * stock_money_value)
-            self.income = harvest_fation * stock_money_value
-            self.expenses = 0
+        stock_value = self.get_prop("main.assets.Stocks", "money_value")
+        change_stock = self.get_prop_setter_function("main.assets.Stocks", "change")
+
+        gold_value = self.get_prop("main.assets.Gold", "money_value")
+        change_gold = self.get_prop_setter_function("main.assets.Gold", "change")
+
+        change_money = self.get_prop_setter_function("main.assets.Money", "change")
+
+        # stocks
+        stock_change = self.assets_stock_ratio * total_assets - stock_value
+        change_stock(money=stock_change)
+        change_money(money=-stock_change)
+        self.expenses += abs(stock_change) * 0.01  # exchange costs
+
+        # gold
+        gold_change = self.assets_gold_ratio * total_assets - gold_value
+        change_gold(money=gold_change)
+        change_money(money=-gold_change)
+        self.expenses += abs(gold_change) * 0.10  # exchange costs
 
         self.add_expenses(self.expenses)
-        self.add_income(self.income)

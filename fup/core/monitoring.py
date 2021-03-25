@@ -34,6 +34,7 @@ class Monitoring:
                 continue
             insurances += self.manager.modules[module_name].expenses
         info_dict["insurances"] = insurances
+        info_dict["assets"] = self.manager.total_assets
 
     def get_final_stats(self):
         return dict(unemployed_months=self.unemployed_months,

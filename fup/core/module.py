@@ -5,6 +5,7 @@ class Module:
         self.manager = manager
         self.depends_on_modules = set()
         self.modifies_modules = set()
+        self.dependency_check = False
 
     def set_manager(self, manager):
         self.manager = manager
@@ -21,13 +22,18 @@ class Module:
     def profile(self):
         return self.manager.profile
 
-    def get_prop_setter(self, module_name, prop, ignore_dependencies=False):
-        if not ignore_dependencies and module_name not in self.modifies_modules:
+    def get_prop_setter(self, module_name, prop):
+        if self.dependency_check:
             self.modifies_modules.add(module_name)
         return lambda x: setattr(self.manager.get_module(module_name), prop, x)
 
-    def get_prop(self, module_name, prop, ignore_dependencies=False):
-        if not ignore_dependencies and module_name not in self.modifies_modules:
+    def get_prop_setter_function(self, module_name, prop):
+        if self.dependency_check:
+            self.modifies_modules.add(module_name)
+        return getattr(self.manager.get_module(module_name), prop)
+
+    def get_prop(self, module_name, prop):
+        if self.dependency_check:
             self.depends_on_modules.add(module_name)
         return getattr(self.manager.get_module(module_name), prop)
 
@@ -88,10 +94,7 @@ class AssetModule(Module):
     def money_value(self):
         return self.count * self.asset_value
 
-    def harvest(self, money):
-        self.count -= money/self.asset_value
-
-    def invest(self, money):
+    def change(self, money):
         self.count += money/self.asset_value
 
     def info_dict(self):
