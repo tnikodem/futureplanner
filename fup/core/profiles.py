@@ -107,9 +107,6 @@ class DefaultProfile:
         self.money_level = min(10, self.money_level)
         self.money_level = max(-10, self.money_level)
 
-        if self.manager.year == self.config["retirement_year"]:  # reset at begin of retirement
-            self.money_level = 0
-
         # update history values
         self.avg_working_expenses_wo_tax *= inflation
         if not self.retired:
