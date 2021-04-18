@@ -6,14 +6,14 @@ class TestProfile:
         self.married = False
         self.partner = False
         self.children = 0
-        self.retired = config["start_year"] >= config["retirement_year"]
+        self.retired = config["simulation"]["start_year"] >= config["profile"]["retirement_year"]
         self.money_level = 0
 
     def add_info(self, info_dict):
         pass
 
     def update(self):
-        self.retired = self.manager.year >= self.config["retirement_year"]
+        self.retired = self.manager.year >= self.config["profile"]["retirement_year"]
 
 
 class DefaultProfile:
@@ -24,15 +24,15 @@ class DefaultProfile:
         self.married = False  # TODO
         self.partner = False  # TODO
         self.children = 0  # TODO
-        self.retired = config["start_year"] >= config["retirement_year"]
+        self.retired = config["simulation"]["start_year"] >= config["profile"]["retirement_year"]
 
         self.years_count = 0
-        self.avg_working_expenses_wo_tax = config["start_expenses"]
+        self.avg_working_expenses_wo_tax = config["simulation"]["start_expenses"]
         # self.income_last_year = config["start_income"]
         # self.expenses_last_year =
 
         # TODO get this by a test run
-        self.retirement_factor = self.config[
+        self.retirement_factor = self.config["profile"][
             "retirement_factor"]  # try to achieve this amount of expensives once you are retired
 
         self.money_level = 0  # -10 to 10
@@ -66,8 +66,8 @@ class DefaultProfile:
 
         # print(f"""inc: {int(income)}({self.config["start_income"]}) exp: {int(expenses)}({self.config["start_expenses"]}) tax: {int(tax)} ({self.config["start_tax"]})""")
 
-        years_till_retirement = max(0, (self.config["retirement_year"] - self.manager.year))
-        years_in_retirenment = (self.config["end_year"] + 1 - max(self.manager.year, self.config["retirement_year"]))
+        years_till_retirement = max(0, (self.config["profile"]["retirement_year"] - self.manager.year))
+        years_in_retirenment = (self.config["simulation"]["end_year"] + 1 - max(self.manager.year, self.config["profile"]["retirement_year"]))
 
         # everything is *inflation corrected* money
 
@@ -94,15 +94,15 @@ class DefaultProfile:
         # print(f"""{self.retired} {self.years_count}: +{int(income_wo_tax)} -{int(expenses_wo_tax)}: {int(self.manager.money)} -> {int(money_at_retirement)} ({self.money_level})""")
         # print(f"""{self.retired} {self.years_count}: -{int(expenses_wo_tax)} <->  -{int(self.avg_working_expenses_wo_tax)}""")
 
-        if money_at_retirement > self.config["desired_money_buffer"] * 10:
+        if money_at_retirement > self.config["profile"]["desired_money_buffer"] * 10:
             self.money_level += 5
-        if money_at_retirement > self.config["desired_money_buffer"] * 4:
+        if money_at_retirement > self.config["profile"]["desired_money_buffer"] * 4:
             self.money_level += 3
-        elif money_at_retirement > self.config["desired_money_buffer"] * 2:
+        elif money_at_retirement > self.config["profile"]["desired_money_buffer"] * 2:
             self.money_level += 1
-        elif money_at_retirement < -self.config["desired_money_buffer"]:
+        elif money_at_retirement < -self.config["profile"]["desired_money_buffer"]:
             self.money_level -= 3
-        elif money_at_retirement < self.config["desired_money_buffer"]:
+        elif money_at_retirement < self.config["profile"]["desired_money_buffer"]:
             self.money_level -= 1
         self.money_level = min(10, self.money_level)
         self.money_level = max(-10, self.money_level)
@@ -112,10 +112,7 @@ class DefaultProfile:
         if not self.retired:
             self.avg_working_expenses_wo_tax = (self.avg_working_expenses_wo_tax * self.years_count
                                                 + expenses - tax - insurances) / (self.years_count + 1)
-            # self.income_last_year = income
-            # self.expenses_last_year = expenses
-            # self.tax_last_year = tax
 
         # set own values
         self.years_count += 1
-        self.retired = self.manager.year >= self.config["retirement_year"]
+        self.retired = self.manager.year >= self.config["profile"]["retirement_year"]

@@ -1,54 +1,57 @@
-# time range
-start_year: 2021
-end_year: 2100
-birth_year: 1900
-retirement_year: 2050
-
-# Environment
-mean_inflation: 2.2
-
-# Your profile (numbers of a whole year)
-# Job
-start_income: 42000
-# Assets
-start_money: 10000
-start_stocks: 0
-start_gold: 0
-start_entgeltpunkte: 0
-# Investments
-assets_stock_ratio: 0.2
-assets_gold_ratio: 0.1
-# Expenses
-start_expenses: 15000  # total of expenses you had last year (not really needed?!)
-flat_expenses: 6000
-car_expenses: 1500
-other_expenses: 3000
-luxury_expenses: 3000
-# Retirement
-retirement_factor: 1  # How much should your expenses decrease in retirement ?
-desired_money_buffer: 10000  # How much money do you want to have after end_year ?
-# tax of last year for fine tuning
-start_taxable_income: 32000
-start_tax: 6700
+# Every number is with regard of a whole year
 
 # Simulation config
-# include randomness in the simulation?
-random: True
-# modules included in simulation
-module_list:
-  - main.environment.Inflation
-  - main.home.Flat
-  - main.insurances.InsuranceHealth
-  - main.insurances.InsuranceNursingCare
-  - main.insurances.InsuranceUnemployment
-  - main.insurances.InsurancePension
-  - main.mobility.Car
-  - main.other.LuxuryExpenses
-  - main.other.OtherExpenses
-  - main.taxes.Taxes
-  - main.work.Job
-  - main.assets.Money
-  - main.assets.Stocks
-  - main.assets.Gold
-module_list_year_end:
-  - main.assets.Investment
+simulation:
+  random: True
+  start_year: 2021
+  end_year: 2100
+
+  # TODO Values below not really needed
+  start_income: 42000  # total of expenses you had last year (not really needed?!)
+  start_expenses: 19000  # total of expenses you had last year (not really needed?!)
+  # for tax fine tuning
+  start_taxable_income: 32000
+  start_tax: 6700
+
+profile:
+  birth_year: 2000
+  retirement_year: 2060
+  # Retirement
+  retirement_factor: 1  # How much should your expenses decrease in retirement ?
+  desired_money_buffer: 10000  # How much money do you want to have after end_year ?
+
+modules:
+  main.environment.Inflation:
+    mean_inflation: 2.2
+  main.home.Flat:
+    start_expenses: 6000
+  main.insurances.InsuranceHealth:
+  main.insurances.InsuranceNursingCare:
+  main.insurances.InsuranceUnemployment:
+  main.insurances.InsurancePension:
+    start_entgeltpunkte: 0
+  main.mobility.Car:
+    start_expenses: 2000
+  main.other.LuxuryExpenses:
+    start_expenses: 7000
+  main.other.OtherExpenses:
+    start_expenses: 3000
+  main.taxes.Taxes:
+  main.work.Job:
+    start_income: 42000
+  main.assets.Money:
+    start_money_value: 1000
+  main.assets.Stocks:
+    start_money_value: 0
+    # S&P 500 since 1900
+    value_increase_mean: 0.038690  # TODO this is only price, add dividend
+    value_increase_std: 0.2
+  main.assets.Gold:
+    start_money_value: 0
+    # Gold price since since 1950
+    value_increase_mean: 0.076029
+    value_increase_std: 0.231742
+  main.assets.Investment:
+    run_end_of_year: True
+    assets_stock_ratio: 0.2
+    assets_gold_ratio: 0.1

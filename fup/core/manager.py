@@ -3,15 +3,20 @@ from fup.core.functions import get_full_name
 from fup.core.monitoring import Monitoring
 from fup.core.profiles import DefaultProfile
 
+class ModuleConfig:
+    def __init__(self, name, module_config, module_class):
+        self.name = name
+        self.module_config = module_config
+        self.module_class = module_class
 
 class Manager:
     def __init__(self, config, module_list, monitoring_class=None, profile_class=None):
         self.config = config
 
         # Globals
-        self.year = config["start_year"]
-        self.income = config["start_income"]
-        self.expenses = config["start_expenses"]
+        self.year = config["simulation"]["start_year"]
+        self.income = config["simulation"]["start_income"]
+        self.expenses = config["simulation"]["start_expenses"]
 
         # Modules
         self.modules = collections.OrderedDict()
@@ -31,7 +36,7 @@ class Manager:
             self.profile = DefaultProfile(config=config, manager=self)
 
     def add_module(self, module):
-        self.modules[get_full_name(module)] = module(self)
+        self.modules[module.name] = module.module_class(self, **module.module_config)
 
     def get_module(self, module_name):
         return self.modules[module_name]

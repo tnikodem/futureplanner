@@ -3,28 +3,26 @@ from fup.core.module import AssetModule, ChangeModule
 
 
 class Money(AssetModule):
-    def __init__(self, manager):
+    def __init__(self, manager, start_money_value):
         super().__init__(manager)
 
-        self.count = manager.config["start_money"]
         self.asset_value = 1
+        self.change(money=start_money_value)
 
     def add_info(self, info_dict):
         info_dict["money"] = self.money_value
 
 
 class Stocks(AssetModule):
-    def __init__(self, manager):
+    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std):
         super().__init__(manager)
-
-        self.count = manager.config["start_stocks"]
         self.asset_value = 1
-        # S&P 500 since 1900
-        self.value_increase_mean = 0.038690  # TODO this is only price, add dividend
-        self.value_increase_std = 0.2
+        self.value_increase_mean = value_increase_mean
+        self.value_increase_std = value_increase_std
+        self.change(money=start_money_value)
 
     def next_year(self):
-        if self.config["random"]:
+        if self.config["simulation"]["random"]:
             self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
         else:
             self.asset_value *= 1 + self.value_increase_mean
@@ -33,30 +31,16 @@ class Stocks(AssetModule):
         info_dict["stocks"] = self.money_value
 
 
-class SavingPlan(AssetModule):
-    # TODO add that money is immobile for 5+ years
-    def __init__(self, manager):
-        super().__init__(manager)
-
-        self.count = manager.config["start_saving_plan"]
-        self.asset_value = 1
-        self.mean_count_increase = 1.001
-
-    def next_year(self):
-        self.count *= self.mean_count_increase
-
-
 class Gold(AssetModule):
-    def __init__(self, manager):
+    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std):
         super().__init__(manager)
-
-        self.count = manager.config["start_gold"]
-        # Gold price since since 1950
-        self.value_increase_mean = 0.076029
-        self.value_increase_std = 0.231742
+        self.asset_value = 1
+        self.value_increase_mean = value_increase_mean
+        self.value_increase_std = value_increase_std
+        self.change(money=start_money_value)
 
     def next_year(self):
-        if self.config["random"]:
+        if self.config["simulation"]["random"]:
             self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
         else:
             self.asset_value *= 1 + self.value_increase_mean
@@ -66,10 +50,10 @@ class Gold(AssetModule):
 
 
 class Investment(ChangeModule):
-    def __init__(self, manager):
+    def __init__(self, manager, assets_stock_ratio, assets_gold_ratio):
         super().__init__(manager)
-        self.assets_stock_ratio = manager.config["assets_stock_ratio"]
-        self.assets_gold_ratio = manager.config["assets_gold_ratio"]
+        self.assets_stock_ratio = assets_stock_ratio
+        self.assets_gold_ratio = assets_gold_ratio
 
     def next_year(self):
         self.expenses = 0

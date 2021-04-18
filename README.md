@@ -9,6 +9,7 @@ This tool can help you, at least concerning your finances.
 An example how your future could look like:
 ![Your assets](./docs/total_assets.png)
 ![Your expenses](./docs/total_expenses.png)
+![Your money level](./docs/money_level.png)
 
 Install
 ----------

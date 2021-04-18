@@ -1,14 +1,28 @@
 import time
+import copy
 import inspect
 import pandas as pd
 import networkx as nx
-from fup.core.manager import Manager
+from fup.core.manager import Manager, ModuleConfig
 from fup.core.functions import get_full_name
 import fup.modules
 
 
 def get_module_list(config):
-    module_list = [m for m in get_all_standard_modules() if get_full_name(m) in config["module_list"]]
+    config = copy.deepcopy(config)
+
+    standard_modules = get_all_standard_modules()
+    module_list = list()
+    for name in config["modules"].keys():
+        module_config = config["modules"][name]
+        if module_config is None:
+            module_config = {}
+        if "run_end_of_year" in module_config and module_config["run_end_of_year"]:
+            continue
+        module_list += [ModuleConfig(name=name,
+                                     module_config=module_config,
+                                     module_class=standard_modules[name]
+                                     )]
 
     # dry run to get dependencies
     manager = Manager(config, module_list)
@@ -42,13 +56,22 @@ def get_module_list(config):
 
     # Traverse Graph
     dep_checked_list = list(reversed(list(nx.dfs_postorder_nodes(G, source="root"))))[1:]
-
     sorted_modules = []
     for module_name in dep_checked_list:
-        sorted_modules += [m for m in module_list if get_full_name(m) == module_name]
+        sorted_modules += [m for m in module_list if m.name == module_name]
 
-    # add end of year modules at the end
-    sorted_modules += [m for m in get_all_standard_modules() if get_full_name(m) in config["module_list_year_end"]]
+    # add end of year modules, without dep check
+    for name in config["modules"].keys():
+        module_config = config["modules"][name]
+        if module_config is None:
+            module_config = {}
+        if "run_end_of_year" not in module_config or not module_config["run_end_of_year"]:
+            continue
+        del module_config["run_end_of_year"]
+        sorted_modules += [ModuleConfig(name=name,
+                                        module_config=module_config,
+                                        module_class=standard_modules[name]
+                                       )]
 
     return sorted_modules
 
@@ -57,10 +80,10 @@ def get_all_standard_modules(module=None, classes=None):
     if module is None:
         module = fup.modules
     if classes is None:
-        classes = []
+        classes = dict()
     for name, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and "fup.modules" in str(obj):   # FIXME a little bit hacky...
-            classes += [obj]
+            classes[get_full_name(obj)] = obj
         if inspect.ismodule(obj) and "fup.modules" in obj.__name__:
             classes = get_all_standard_modules(module=obj, classes=classes)
     return classes
@@ -81,6 +104,8 @@ def get_module_start_values(config, profile_class=None, monitoring_class=None):
 
 
 def run_toys(config, runs=100, profile_class=None, monitoring_class=None, debug=False):
+    config = copy.deepcopy(config)
+
     time_start = time.time()
 
     module_list = get_module_list(config)
@@ -92,7 +117,7 @@ def run_toys(config, runs=100, profile_class=None, monitoring_class=None, debug=
                                            profile_class=profile_class, monitoring_class=monitoring_class)
 
         df_rows = []
-        for i_year in range(config["end_year"] - config["start_year"]):
+        for i_year in range(config["simulation"]["end_year"] - config["simulation"]["start_year"]):
             manager.next_year()
             df_rows += [manager.get_df_row()]
         df = pd.DataFrame(df_rows)

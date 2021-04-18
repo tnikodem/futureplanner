@@ -3,15 +3,15 @@ from fup.core.module import ChangeModule
 
 
 class Job(ChangeModule):
-    def __init__(self, manager):
+    def __init__(self, manager, start_income):
         super().__init__(manager)
         # Module props
         self.income = 0
 
         # Main properties
-        self.salary_per_month = manager.config["start_income"] / 12
-        self.expires = manager.config["retirement_year"]
-        self.birth_year = manager.config["birth_year"]
+        self.salary_per_month = start_income / 12
+        self.expires = manager.config["profile"]["retirement_year"]
+        self.birth_year = manager.config["profile"]["birth_year"]
 
         # Helper props
         self.prob_lose_job = 1. / 90.
@@ -36,7 +36,7 @@ class Job(ChangeModule):
             self.unemployed_months = 0
             return
 
-        if self.config["random"]:
+        if self.config["simulation"]["random"]:
             self.salary_per_month *=  (inflation + random.gauss(mu=.005, sigma=0.001))
             self.unemployed_months = 0
             for i in range(12):  # 12 months

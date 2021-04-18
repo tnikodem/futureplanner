@@ -36,11 +36,11 @@ class InsuranceNursingCare(ChangeModule):
 
 
 class InsurancePension(ChangeModule):
-    def __init__(self, manager):
+    def __init__(self, manager, start_entgeltpunkte):
         super().__init__(manager)
         self.income = 0
         self.expenses = 0
-        self.entgeltpunkte = manager.config["start_entgeltpunkte"]
+        self.entgeltpunkte = start_entgeltpunkte
         self.new_entgeldpunkte = 0
         self.durchschnittseinkommen = 38901  # 2019
         self.rentenwert = 33 * 12  # 2019
@@ -49,7 +49,7 @@ class InsurancePension(ChangeModule):
 
     @property
     def expected_income(self):
-        years_till_retirement = max((self.config["retirement_year"] - self.year), 0)
+        years_till_retirement = max((self.config["profile"]["retirement_year"] - self.year), 0)
         expected_entgeldpunkte = self.entgeltpunkte + years_till_retirement * self.new_entgeldpunkte
         return expected_entgeldpunkte * self.rentenwert
 
@@ -97,7 +97,7 @@ class InsuranceUnemployment(ChangeModule):
 
         # Main properties
         self.salary_fraction = 0.6
-        self.birth_year = manager.config["birth_year"]
+        self.birth_year = manager.config["profile"]["birth_year"]
 
         # Helper properties
         self.months_you_get_unemployment_money = 12
