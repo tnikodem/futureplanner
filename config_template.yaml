@@ -55,3 +55,7 @@ modules:
     run_end_of_year: True
     assets_stock_ratio: 0.2
     assets_gold_ratio: 0.1
+
+  events.crisis.OilCrisis1973:
+      start_year: 2045
+

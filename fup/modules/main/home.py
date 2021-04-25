@@ -10,4 +10,3 @@ class Flat(ChangeModule):
     def next_year(self):
         inflation = self.get_prop("main.environment.Inflation", "inflation")
         self.expenses *= inflation
-        self.add_expenses(self.expenses)

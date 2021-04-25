@@ -6,6 +6,7 @@ class Module:
         self.depends_on_modules = set()
         self.modifies_modules = set()
         self.dependency_check = False
+        self.reset_values = dict()
 
     def set_manager(self, manager):
         self.manager = manager
@@ -22,21 +23,36 @@ class Module:
     def profile(self):
         return self.manager.profile
 
-    def get_prop_setter(self, module_name, prop):
+    # TODO rename set_prop and get_prop to show difference
+    def set_prop(self, prop_name, value):
+        if prop_name not in self.reset_values:
+            self.reset_values[prop_name] = getattr(self, prop_name)
+        if value is None:
+            setattr(self, prop_name, self.reset_values[prop_name])
+            del self.reset_values[prop_name]
+        else:
+            setattr(self, prop_name, value)
+
+    def get_prop(self, module_name, prop_name):
+        if self.dependency_check:
+            self.depends_on_modules.add(module_name)
+        return getattr(self.manager.get_module(module_name), prop_name)
+
+    def get_prop_setter(self, module_name, prop_name):
         if self.dependency_check:
             self.modifies_modules.add(module_name)
-        return lambda x: setattr(self.manager.get_module(module_name), prop, x)
+        return lambda x: self.manager.get_module(module_name).set_prop(prop_name=prop_name, value=x)
 
     def get_prop_setter_function(self, module_name, prop):
         if self.dependency_check:
             self.modifies_modules.add(module_name)
         return getattr(self.manager.get_module(module_name), prop)
 
-    def get_prop(self, module_name, prop):
-        if self.dependency_check:
-            self.depends_on_modules.add(module_name)
-        return getattr(self.manager.get_module(module_name), prop)
+    # wrapper which can be overwritten by submodule class
+    def calc_next_year(self):
+        self.next_year()
 
+    # Implemented by each module definition
     def next_year(self):
         pass
 
@@ -62,14 +78,31 @@ class Module:
 class ChangeModule(Module):
     def __init__(self, manager=None):
         super().__init__(manager)
-        self.expenses = 0
-        self.income = 0
+        self._expenses = 0
+        self._expense_modifier = 1
+        self._income = 0
+        self._income_modifier = 1
 
-    def add_income(self, income):
-        self.manager.income += income
+    @property
+    def expenses(self):
+        return self._expenses * self._expense_modifier
 
-    def add_expenses(self, expenses):
-        self.manager.expenses += expenses
+    @expenses.setter
+    def expenses(self, value):
+        self._expenses = value
+
+    @property
+    def income(self):
+        return self._income * self._income_modifier
+
+    @income.setter
+    def income(self, value):
+        self._income = value
+
+    def calc_next_year(self):
+        self.next_year()
+        self.manager.income += self.income
+        self.manager.expenses += self.expenses
 
     def info_dict(self):
         return dict(
@@ -96,6 +129,9 @@ class AssetModule(Module):
 
     def change(self, money):
         self.count += money/self.asset_value
+
+    def change_value(self, relative_change):
+        self.asset_value *= relative_change
 
     def info_dict(self):
         return dict(

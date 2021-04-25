@@ -53,5 +53,3 @@ class Taxes(ChangeModule):
 
         self.tax_rate = self.calcualte_taxrate(taxable_income=taxable_income)
         self.expenses = taxable_income * self.tax_rate
-
-        self.add_expenses(self.expenses)

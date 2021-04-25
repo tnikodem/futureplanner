@@ -14,8 +14,8 @@ class Job(ChangeModule):
         self.birth_year = manager.config["profile"]["birth_year"]
 
         # Helper props
-        self.prob_lose_job = 1. / 90.
-        self.prob_find_job = 1. / 12.
+        self.prob_lose_job = 1.
+        self.prob_find_job = 10.
         # How much does it costs to find a new job?
         # Movement ?
         # Lower salary?
@@ -41,10 +41,10 @@ class Job(ChangeModule):
             self.unemployed_months = 0
             for i in range(12):  # 12 months
                 if self.unemployed_since > 0:
-                    if random.random() < self.prob_find_job:
+                    if random.random() < self.prob_find_job/100:
                         self.unemployed_since = 0
                 else:
-                    if random.random() < self.prob_lose_job:
+                    if random.random() < self.prob_lose_job/100.:
                         self.unemployed_since = 1
 
                 if self.unemployed_since > 0:
@@ -54,5 +54,3 @@ class Job(ChangeModule):
             self.salary_per_month *= inflation
 
         self.income = (12 - self.unemployed_months) * self.salary_per_month
-
-        self.add_income(self.income)

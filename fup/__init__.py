@@ -10,4 +10,4 @@
 __version__ = '0.1'
 
 import fup.modules.main
-
+import fup.modules.events

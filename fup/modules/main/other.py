@@ -9,7 +9,6 @@ class OtherExpenses(ChangeModule):
     def next_year(self):
         total_inflation = self.get_prop("main.environment.Inflation", "total_inflation")
         self.expenses = total_inflation * self.start_expenses
-        self.add_expenses(self.expenses)
 
 
 class LuxuryExpenses(ChangeModule):
@@ -23,4 +22,3 @@ class LuxuryExpenses(ChangeModule):
         self.expenses = total_inflation * self.start_expenses
         # adapt to money situation
         self.expenses *= 1. + self.profile.money_level/10.
-        self.add_expenses(self.expenses)

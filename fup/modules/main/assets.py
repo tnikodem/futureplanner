@@ -21,6 +21,8 @@ class Stocks(AssetModule):
         self.value_increase_std = value_increase_std
         self.change(money=start_money_value)
 
+        # TODO add 25% tax on value increase, when sold
+
     def next_year(self):
         if self.config["simulation"]["random"]:
             self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
@@ -38,6 +40,9 @@ class Gold(AssetModule):
         self.value_increase_mean = value_increase_mean
         self.value_increase_std = value_increase_std
         self.change(money=start_money_value)
+
+        # no tax, if gold is hold longer than 1 year
+        # differntial tax on silver ~ 10% tax if bought, no tax if sold
 
     def next_year(self):
         if self.config["simulation"]["random"]:
@@ -78,5 +83,3 @@ class Investment(ChangeModule):
         change_gold(money=gold_change)
         change_money(money=-gold_change)
         self.expenses += abs(gold_change) * 0.10  # exchange costs
-
-        self.add_expenses(self.expenses)

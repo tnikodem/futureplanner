@@ -46,7 +46,7 @@ class Manager:
         self.income = 0
         self.expenses = 0
         for module_name in self.modules:
-            self.modules[module_name].next_year()
+            self.modules[module_name].calc_next_year()
 
         self.get_module("main.assets.Money").count += self.income - self.expenses
 

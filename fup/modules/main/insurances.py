@@ -13,7 +13,6 @@ class InsuranceHealth(ChangeModule):
     def next_year(self):
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
         self.expenses = income * self.fraction_of_income
-        self.add_expenses(self.expenses)
 
 
 class InsuranceNursingCare(ChangeModule):
@@ -32,7 +31,6 @@ class InsuranceNursingCare(ChangeModule):
 
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
         self.expenses = income * self.fraction_of_income
-        self.add_expenses(self.expenses)
 
 
 class InsurancePension(ChangeModule):
@@ -84,8 +82,6 @@ class InsurancePension(ChangeModule):
             self.income = self.entgeltpunkte * self.rentenwert
             self.expenses = 0
 
-        self.add_income(self.income)
-        self.add_expenses(self.expenses)
 
 
 class InsuranceUnemployment(ChangeModule):
@@ -128,5 +124,3 @@ class InsuranceUnemployment(ChangeModule):
             self.income = month_you_get_money * salary_per_month * (1 - tax_rate) * self.salary_fraction
             self.expenses = min(12-unemployed_months, 0) * salary_per_month * self.fraction_of_income
 
-        self.add_income(self.income)
-        self.add_expenses(self.expenses)

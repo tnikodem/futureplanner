@@ -9,5 +9,3 @@ class Car(ChangeModule):
     def next_year(self):
         total_inflation = self.get_prop("main.environment.Inflation", "total_inflation")
         self.expenses = total_inflation * self.start_expenses
-
-        self.add_expenses(self.expenses)
