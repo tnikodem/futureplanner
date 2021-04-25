@@ -14,41 +14,44 @@ class Money(AssetModule):
 
 
 class Stocks(AssetModule):
-    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std):
+    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std, settlement_tax,
+                 exchange_fee, depot_costs):
         super().__init__(manager)
-        self.asset_value = 1
+        self.count = start_money_value
         self.value_increase_mean = value_increase_mean
         self.value_increase_std = value_increase_std
-        self.change(money=start_money_value)
-
-        # TODO add 25% tax on value increase, when sold
+        self.settlement_tax = settlement_tax
+        self.exchange_fee = exchange_fee
+        self.depot_costs = depot_costs
 
     def next_year(self):
         if self.config["simulation"]["random"]:
             self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
         else:
             self.asset_value *= 1 + self.value_increase_mean
+        self.change(money=-self.money_value*self.depot_costs)
 
     def add_info(self, info_dict):
         info_dict["stocks"] = self.money_value
 
 
 class Gold(AssetModule):
-    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std):
+    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std, settlement_tax,
+                 exchange_fee, depot_costs):
         super().__init__(manager)
-        self.asset_value = 1
+        self.count = start_money_value
         self.value_increase_mean = value_increase_mean
         self.value_increase_std = value_increase_std
-        self.change(money=start_money_value)
-
-        # no tax, if gold is hold longer than 1 year
-        # differntial tax on silver ~ 10% tax if bought, no tax if sold
+        self.settlement_tax = settlement_tax
+        self.exchange_fee = exchange_fee
+        self.depot_costs = depot_costs
 
     def next_year(self):
         if self.config["simulation"]["random"]:
             self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
         else:
             self.asset_value *= 1 + self.value_increase_mean
+        self.change(money=-self.money_value*self.depot_costs)
 
     def add_info(self, info_dict):
         info_dict["gold"] = self.money_value
@@ -74,12 +77,8 @@ class Investment(ChangeModule):
 
         # stocks
         stock_change = self.assets_stock_ratio * total_assets - stock_value
-        change_stock(money=stock_change)
-        change_money(money=-stock_change)
-        self.expenses += abs(stock_change) * 0.01  # exchange costs
+        change_money(money=change_stock(money=stock_change))
 
         # gold
         gold_change = self.assets_gold_ratio * total_assets - gold_value
-        change_gold(money=gold_change)
-        change_money(money=-gold_change)
-        self.expenses += abs(gold_change) * 0.10  # exchange costs
+        change_money(money=change_gold(money=gold_change))

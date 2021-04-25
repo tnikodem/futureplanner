@@ -122,13 +122,25 @@ class AssetModule(Module):
         super().__init__(manager)
         self.count = 0
         self.asset_value = 1
+        self.settlement_tax = 0
+        self.exchange_fee = 0
 
     @property
     def money_value(self):
         return self.count * self.asset_value
 
+    # TODO need unit test!!
     def change(self, money):
-        self.count += money/self.asset_value
+        if money > 0:
+            self.add_asset_value = 1
+            self.add_count = money / self.add_asset_value * (1-self.exchange_fee)
+            self.asset_value = (self.count * self.add_asset_value + self.add_count *self.add_asset_value) / \
+                               (self.count + self.add_count)
+            self.count += self.add_count
+            return -money
+        else:
+            self.count += money/self.asset_value
+            return -money*(1-self.settlement_tax)*(1-self.exchange_fee)
 
     def change_value(self, relative_change):
         self.asset_value *= relative_change
