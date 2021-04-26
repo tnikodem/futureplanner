@@ -3,20 +3,17 @@ from fup.core.module import AssetModule, ChangeModule
 
 
 class Money(AssetModule):
-    def __init__(self, manager, start_money_value):
-        super().__init__(manager)
-
+    def __init__(self, start_money_value):
         self.asset_value = 1
-        self.change(money=start_money_value)
+        self.count = start_money_value
 
     def add_info(self, info_dict):
         info_dict["money"] = self.money_value
 
 
 class Stocks(AssetModule):
-    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std, settlement_tax,
+    def __init__(self, start_money_value, value_increase_mean, value_increase_std, settlement_tax,
                  exchange_fee, depot_costs):
-        super().__init__(manager)
         self.count = start_money_value
         self.value_increase_mean = value_increase_mean
         self.value_increase_std = value_increase_std
@@ -33,12 +30,12 @@ class Stocks(AssetModule):
 
     def add_info(self, info_dict):
         info_dict["stocks"] = self.money_value
+        info_dict["stocks_value"] = self.asset_value
 
 
 class Gold(AssetModule):
-    def __init__(self, manager, start_money_value, value_increase_mean, value_increase_std, settlement_tax,
+    def __init__(self, start_money_value, value_increase_mean, value_increase_std, settlement_tax,
                  exchange_fee, depot_costs):
-        super().__init__(manager)
         self.count = start_money_value
         self.value_increase_mean = value_increase_mean
         self.value_increase_std = value_increase_std
@@ -58,8 +55,7 @@ class Gold(AssetModule):
 
 
 class Investment(ChangeModule):
-    def __init__(self, manager, assets_stock_ratio, assets_gold_ratio):
-        super().__init__(manager)
+    def __init__(self, assets_stock_ratio, assets_gold_ratio):
         self.assets_stock_ratio = assets_stock_ratio
         self.assets_gold_ratio = assets_gold_ratio
 

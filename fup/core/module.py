@@ -1,7 +1,9 @@
-from fup.core.functions import get_full_name
+from fup.core.functions import get_full_class_name
+
 
 class Module:
-    def __init__(self, manager=None):
+    def __init__(self, name="", manager=None):
+        self.name = name
         self.manager = manager
         self.depends_on_modules = set()
         self.modifies_modules = set()
@@ -63,21 +65,19 @@ class Module:
         return ""
 
     def info_dict(self):
-        return dict(
-            name=get_full_name(self.__class__),
-            income=0,
-            expenses=0,
-            value=0,
-            info=self.get_extra_info()
-        )
+        return {
+            "name": self.name,
+            "class": get_full_class_name(self.__class__),
+            "info": self.get_extra_info()
+        }
 
     def __repr__(self):
-        return f"""{get_full_name(self.__class__)}"""
+        return f"""{get_full_class_name(self.__class__)}"""
 
 
 class ChangeModule(Module):
-    def __init__(self, manager=None):
-        super().__init__(manager)
+    def __init__(self, name="", manager=None):
+        super().__init__(name=name, manager=manager)
         self._expenses = 0
         self._expense_modifier = 1
         self._income = 0
@@ -105,21 +105,18 @@ class ChangeModule(Module):
         self.manager.expenses += self.expenses
 
     def info_dict(self):
-        return dict(
-            name=get_full_name(self.__class__),
-            income=self.income,
-            expenses=self.expenses,
-            value=0,
-            info=self.get_extra_info()
-        )
+        out_dict = super().info_dict()
+        out_dict["income"] = self.income
+        out_dict["expenses"] = self.expenses
+        return out_dict
 
     def __repr__(self):
-        return f"""{get_full_name(self.__class__)}: income: {int(self.income)}€ expenses: {int(self.expenses)}€"""
+        return f"""{get_full_class_name(self.__class__)}: income: {int(self.income)}€ expenses: {int(self.expenses)}€"""
 
 
 class AssetModule(Module):
-    def __init__(self, manager=None):
-        super().__init__(manager)
+    def __init__(self, name="", manager=None):
+        super().__init__(name=name, manager=manager)
         self.count = 0
         self.asset_value = 1
         self.settlement_tax = 0
@@ -129,30 +126,30 @@ class AssetModule(Module):
     def money_value(self):
         return self.count * self.asset_value
 
-    # TODO need unit test!!
+    # TODO check and unit test!!
     def change(self, money):
         if money > 0:
-            self.add_asset_value = 1
-            self.add_count = money / self.add_asset_value * (1-self.exchange_fee)
-            self.asset_value = (self.count * self.add_asset_value + self.add_count *self.add_asset_value) / \
-                               (self.count + self.add_count)
-            self.count += self.add_count
+            add_asset_value = 1
+            add_count = money / add_asset_value * (1-self.exchange_fee)
+            self.asset_value = (self.count*self.asset_value + add_count*add_asset_value) / \
+                               (self.count + add_count)
+            self.count += add_count
             return -money
         else:
-            self.count += money/self.asset_value
-            return -money*(1-self.settlement_tax)*(1-self.exchange_fee)
+            return_money = abs(money)
+            self.count -= return_money/self.asset_value
+            if self.asset_value > 1:
+                return_money -= return_money * (self.asset_value-1)/self.asset_value * self.settlement_tax
+            return_money *= (1-self.exchange_fee)  # TODO before or after tax??!
+            return return_money
 
     def change_value(self, relative_change):
         self.asset_value *= relative_change
 
     def info_dict(self):
-        return dict(
-            name=get_full_name(self.__class__),
-            income=0,
-            expenses=0,
-            value=self.money_value,
-            info=self.get_extra_info()
-        )
+        out_dict = super().info_dict()
+        out_dict["value"] = self.money_value
+        return out_dict
 
     def __repr__(self):
-        return f"""{get_full_name(self.__class__)}: count: {self.income} value: {int(self.get_money_value())}€"""
+        return f"""{get_full_class_name(self.__class__)}: count: {self.income} value: {int(self.get_money_value())}€"""

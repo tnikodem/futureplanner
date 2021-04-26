@@ -3,8 +3,7 @@ from fup.core.module import ChangeModule
 
 
 class Flat(ChangeModule):
-    def __init__(self, manager, start_expenses):
-        super().__init__(manager)
+    def __init__(self, start_expenses):
         self.expenses = start_expenses
 
     def next_year(self):

@@ -15,8 +15,7 @@ class OilCrisis1973(ChangeModule):
     >> Gold was legalised 1973 in USA!
     """
 
-    def __init__(self, manager, start_year):
-        super().__init__(manager)
+    def __init__(self, start_year):
         self.start_year = start_year
 
     def next_year(self):

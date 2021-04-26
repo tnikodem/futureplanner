@@ -33,7 +33,7 @@ setup(
         'numpy==1.19.*',
         'pandas==1.2.*',
         'bokeh==2.2.*',
-        'yaml==0.2.*'
+        'ruamel.yaml==0.16.*'
     ],
     extras_require={
         'dev': [

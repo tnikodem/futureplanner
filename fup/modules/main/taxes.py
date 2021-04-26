@@ -3,9 +3,7 @@ from fup.core.module import ChangeModule
 
 
 class Taxes(ChangeModule):
-    def __init__(self, manager):
-        super().__init__(manager)
-        self.expenses = 0
+    def __init__(self):
         self.tax_rate = 0
 
         # freisteuer
@@ -16,11 +14,12 @@ class Taxes(ChangeModule):
 
         self.real_tax_factor = 1
 
-        # adjust tax based on current tax
-        if self.config.get("start_taxable_income"):
-            estimated_taxrate = self.calcualte_taxrate(taxable_income=self.config["start_taxable_income"])
-            if estimated_taxrate > 0:
-                self.real_tax_factor = 1.0 * self.config["start_tax"] / self.config["start_taxable_income"] / estimated_taxrate
+# TODO tax finetuning
+#        # adjust tax based on current tax
+#        if self.config.get("start_taxable_income"):
+#            estimated_taxrate = self.calcualte_taxrate(taxable_income=self.config["start_taxable_income"])
+#            if estimated_taxrate > 0:
+#                self.real_tax_factor = 1.0 * self.config["start_tax"] / self.config["start_taxable_income"] / estimated_taxrate
 
     def calcualte_taxrate(self, taxable_income):
         # calculate tax rate estimation

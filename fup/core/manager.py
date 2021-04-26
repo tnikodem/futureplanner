@@ -1,5 +1,5 @@
 import collections
-from fup.core.functions import get_full_name
+from fup.core.functions import get_full_class_name
 from fup.core.monitoring import Monitoring
 from fup.core.profiles import DefaultProfile
 
@@ -36,7 +36,9 @@ class Manager:
             self.profile = DefaultProfile(config=config, manager=self)
 
     def add_module(self, module):
-        self.modules[module.name] = module.module_class(self, **module.module_config)
+        self.modules[module.name] = module.module_class(**module.module_config)
+        super(module.module_class, self.modules[module.name]).__init__(name=module.name, manager=self)
+        self.modules[module.name].__init__(**module.module_config)  # TODO bit hacky??!
 
     def get_module(self, module_name):
         return self.modules[module_name]

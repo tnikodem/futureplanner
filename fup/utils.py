@@ -4,12 +4,12 @@ import inspect
 import pandas as pd
 import networkx as nx
 from fup.core.manager import Manager, ModuleConfig
-from fup.core.functions import get_full_name
+from fup.core.functions import get_full_class_name
 import fup.modules
 
 
 def get_module_list(config):
-    config = copy.deepcopy(config)
+    config = copy.deepcopy(config)  # dict is "cleaned"
 
     standard_modules = get_all_standard_modules()
     module_list = list()
@@ -19,9 +19,14 @@ def get_module_list(config):
             module_config = {}
         if "run_end_of_year" in module_config and module_config["run_end_of_year"]:
             continue
+        if "class" in module_config:
+            module_class = standard_modules[module_config["class"]]
+            del module_config["class"]
+        else:
+            module_class = standard_modules[name]
         module_list += [ModuleConfig(name=name,
                                      module_config=module_config,
-                                     module_class=standard_modules[name]
+                                     module_class=module_class
                                      )]
 
     # dry run to get dependencies
@@ -68,9 +73,14 @@ def get_module_list(config):
         if "run_end_of_year" not in module_config or not module_config["run_end_of_year"]:
             continue
         del module_config["run_end_of_year"]
+        if "class" in module_config:
+            module_class = standard_modules[module_config["class"]]
+            del module_config["class"]
+        else:
+            module_class = standard_modules[name]
         sorted_modules += [ModuleConfig(name=name,
                                         module_config=module_config,
-                                        module_class=standard_modules[name]
+                                        module_class=module_class
                                        )]
 
     return sorted_modules
@@ -83,7 +93,7 @@ def get_all_standard_modules(module=None, classes=None):
         classes = dict()
     for name, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and "fup.modules" in str(obj):   # FIXME a little bit hacky...
-            classes[get_full_name(obj)] = obj
+            classes[get_full_class_name(obj)] = obj
         if inspect.ismodule(obj) and "fup.modules" in obj.__name__:
             classes = get_all_standard_modules(module=obj, classes=classes)
     return classes

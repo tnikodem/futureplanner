@@ -3,17 +3,8 @@ from fup.core.module import ChangeModule
 
 
 class Job(ChangeModule):
-    def __init__(self, manager, start_income):
-        super().__init__(manager)
-        # Module props
-        self.income = 0
-
-        # Main properties
+    def __init__(self, start_income):
         self.salary_per_month = start_income / 12
-        self.expires = manager.config["profile"]["retirement_year"]
-        self.birth_year = manager.config["profile"]["birth_year"]
-
-        # Helper props
         self.prob_lose_job = 1.
         self.prob_find_job = 10.
         # How much does it costs to find a new job?
@@ -24,7 +15,6 @@ class Job(ChangeModule):
         self.unemployed_months = 0
 
     def next_year(self):
-        # dependencies on the very top!
         inflation = self.get_prop("main.environment.Inflation", "inflation")
 
         #        if self.year - self.birth_year > 50:
