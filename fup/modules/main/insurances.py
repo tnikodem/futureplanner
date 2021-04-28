@@ -17,7 +17,7 @@ class InsuranceNursingCare(ChangeModule):
     def next_year(self):
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
         fraction_of_income = self.fraction_of_income
-        if self.profile.retired:
+        if self.manager.profile.retired:
             fraction_of_income *= 2
         self.expenses = income * self.fraction_of_income
 
@@ -32,7 +32,7 @@ class InsurancePension(ChangeModule):
 
     @property
     def expected_income(self):
-        years_till_retirement = max((self.config["profile"]["retirement_year"] - self.year), 0)
+        years_till_retirement = max((self.config["profile"]["retirement_year"] - self.manager.year), 0)
         expected_entgeldpunkte = self.entgeltpunkte + years_till_retirement * self.new_entgeldpunkte
         return expected_entgeldpunkte * self.rentenwert
 
@@ -42,7 +42,7 @@ class InsurancePension(ChangeModule):
 
         self.rentenwert *= inflation
         self.durchschnittseinkommen *= inflation
-        if not self.profile.retired:
+        if not self.manager.profile.retired:
             self.new_entgeldpunkte = min(job_income / self.durchschnittseinkommen, 2.1)
             self.entgeltpunkte += self.new_entgeldpunkte
             self.income = 0
@@ -85,10 +85,10 @@ class InsuranceUnemployment(ChangeModule):
         #tax_rate = self.get_prop("main.taxes.Taxes", "tax_rate")
         tax_rate = 0.3  # TODO better formula to get unemployment money, howver Prio B...
 
-        if self.year - birth_year > 50:
+        if self.manager.year - birth_year > 50:
             self.months_you_get_unemployment_money = 24
 
-        if self.profile.retired:
+        if self.manager.profile.retired:
             self.income = 0
             self.expenses = 0
         elif unemployed_months < 1:

@@ -10,45 +10,24 @@ class Module:
         self.dependency_check = False
         self.reset_values = dict()
 
-    def set_manager(self, manager):
-        self.manager = manager
-
-    @property
-    def year(self):
-        return self.manager.year
-
     @property
     def config(self):
         return self.manager.config
-
-    @property
-    def profile(self):
-        return self.manager.profile
-
-    # TODO rename set_prop and get_prop to show difference
-    def set_prop(self, prop_name, value):
-        if prop_name not in self.reset_values:
-            self.reset_values[prop_name] = getattr(self, prop_name)
-        if value is None:
-            setattr(self, prop_name, self.reset_values[prop_name])
-            del self.reset_values[prop_name]
-        else:
-            setattr(self, prop_name, value)
 
     def get_prop(self, module_name, prop_name):
         if self.dependency_check:
             self.depends_on_modules.add(module_name)
         return getattr(self.manager.get_module(module_name), prop_name)
 
-    def get_prop_setter(self, module_name, prop_name):
-        if self.dependency_check:
-            self.modifies_modules.add(module_name)
-        return lambda x: self.manager.get_module(module_name).set_prop(prop_name=prop_name, value=x)
+    def change_prop(self, prop_name, change_value):
+        prop_value = getattr(self, prop_name)
+        prop_value *= change_value
+        setattr(self, prop_name, prop_value)
 
-    def get_prop_setter_function(self, module_name, prop):
+    def get_prop_changer(self, module_name, prop_name):
         if self.dependency_check:
             self.modifies_modules.add(module_name)
-        return getattr(self.manager.get_module(module_name), prop)
+        return lambda x: self.manager.get_module(module_name).change_prop(prop_name=prop_name, change_value=x)
 
     # wrapper which can be overwritten by submodule class
     def calc_next_year(self):

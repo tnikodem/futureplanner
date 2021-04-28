@@ -21,7 +21,7 @@ class Job(ChangeModule):
         #            self.prob_lose_job = 1./60.   # ???
         #            self.prob_find_job = 1./120.  # ???
 
-        if self.profile.retired:
+        if self.manager.profile.retired:
             self.income = 0
             self.unemployed_months = 0
             return

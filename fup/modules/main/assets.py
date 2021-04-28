@@ -64,12 +64,12 @@ class Investment(ChangeModule):
         total_assets = self.manager.total_assets
 
         stock_value = self.get_prop("main.assets.Stocks", "money_value")
-        change_stock = self.get_prop_setter_function("main.assets.Stocks", "change")
+        change_stock = self.get_prop("main.assets.Stocks", "change")
 
         gold_value = self.get_prop("main.assets.Gold", "money_value")
-        change_gold = self.get_prop_setter_function("main.assets.Gold", "change")
+        change_gold = self.get_prop("main.assets.Gold", "change")
 
-        change_money = self.get_prop_setter_function("main.assets.Money", "change")
+        change_money = self.get_prop("main.assets.Money", "change")
 
         # stocks
         stock_change = self.assets_stock_ratio * total_assets - stock_value
