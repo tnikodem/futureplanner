@@ -113,7 +113,7 @@ def get_module_start_values(config, profile_class=None, monitoring_class=None):
     return df_mods
 
 
-def run_toys(config, runs=100, profile_class=None, monitoring_class=None, debug=False):
+def run_montecarlo(config, runs=100, profile_class=None, monitoring_class=None, debug=False):
     config = copy.deepcopy(config)
 
     time_start = time.time()
@@ -131,6 +131,8 @@ def run_toys(config, runs=100, profile_class=None, monitoring_class=None, debug=
             manager.next_year()
             df_rows += [manager.get_df_row()]
         df = pd.DataFrame(df_rows)
+
+        df["run"] = i
 
         # tax correction
         df["expenses_net"] = df["expenses"] - df["tax"] - df["insurances"]
