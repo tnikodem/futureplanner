@@ -2,13 +2,6 @@ import re
 import io
 from setuptools import setup
 
-# Metadata goes in setup.cfg. These are here for GitHub's dependency graph.
-setup(
-    name="FuturePlanner",
-    install_requires=[
-        "numpy"
-    ]
-)
 
 with io.open('README.md', 'rt', encoding='utf8') as f:
     readme = f.read()
@@ -28,17 +21,17 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    python_requires='>=3.8',
+    python_requires='>=3.9',
     install_requires=[
-        'numpy==1.19.*',
+        'numpy==1.20.*',
         'pandas==1.2.*',
-        'bokeh==2.2.*',
+        'bokeh==2.3.*',
         'ruamel.yaml==0.16.*'
     ],
     extras_require={
         'dev': [
-            'pytest==4.0.*',
-            'pytest-cov==2.6.*',
+        'pytest==6.2.3',
+        'pytest-cov==2.11.1'
         ]
     },
     # entry_points={
@@ -47,4 +40,3 @@ setup(
     #     ],
     # },
 )
-
