@@ -1,24 +1,30 @@
 import time
 import copy
-import inspect
 import pandas as pd
 import networkx as nx
 from fup.core.manager import Manager, ModuleConfig
-from fup.core.functions import get_full_class_name
+from fup.core.functions import get_all_modules
 import fup.modules
 
 
-def get_module_list(config):
+def get_module_list(config, end_of_year=False):
     config = copy.deepcopy(config)  # dict is "cleaned"
+    standard_modules = get_all_modules(module=fup.modules)
 
-    standard_modules = get_all_standard_modules()
-    module_list = list()
+    module_list = []
     for name in config["modules"].keys():
         module_config = config["modules"][name]
         if module_config is None:
             module_config = {}
-        if "run_end_of_year" in module_config and module_config["run_end_of_year"]:
-            continue
+
+        if end_of_year:
+            if "run_end_of_year" not in module_config or not module_config["run_end_of_year"]:
+                continue
+            del module_config["run_end_of_year"]
+        else:
+            if "run_end_of_year" in module_config and module_config["run_end_of_year"]:
+                continue
+
         if "class" in module_config:
             module_class = standard_modules[module_config["class"]]
             del module_config["class"]
@@ -28,14 +34,17 @@ def get_module_list(config):
                                      module_config=module_config,
                                      module_class=module_class
                                      )]
+    return module_list
+
+
+def get_sorted_modules(config):
+    module_list = get_module_list(config=config)
 
     # dry run to get dependencies
     manager = Manager(config, module_list)
     manager.dependency_check()
-
     G = nx.DiGraph()
     G.add_node("root")
-
     # look up all dependencies
     for module_name in manager.modules:
         module = manager.modules[module_name]
@@ -44,63 +53,31 @@ def get_module_list(config):
             G.add_edge(dep_name, module_name)
         for modify_name in module.modifies_modules:
             G.add_edge(module_name, modify_name)
-
     # check for loop
     try:
         cycle = nx.find_cycle(G, orientation="original")
         raise Exception(f"Dependency loop found: {cycle}")
     except nx.NetworkXNoCycle:
         pass
-
     # add root dependencies
     for node in G.nodes():
         if node == "root":
             continue
         if len(G.in_edges(node)) < 1:
             G.add_edge("root", node)
-
     # Traverse Graph
     dep_checked_list = list(reversed(list(nx.dfs_postorder_nodes(G, source="root"))))[1:]
     sorted_modules = []
     for module_name in dep_checked_list:
         sorted_modules += [m for m in module_list if m.name == module_name]
 
-    # add end of year modules, without dep check
-    for name in config["modules"].keys():
-        module_config = config["modules"][name]
-        if module_config is None:
-            module_config = {}
-        if "run_end_of_year" not in module_config or not module_config["run_end_of_year"]:
-            continue
-        del module_config["run_end_of_year"]
-        if "class" in module_config:
-            module_class = standard_modules[module_config["class"]]
-            del module_config["class"]
-        else:
-            module_class = standard_modules[name]
-        sorted_modules += [ModuleConfig(name=name,
-                                        module_config=module_config,
-                                        module_class=module_class
-                                       )]
+    sorted_modules += get_module_list(config, end_of_year=True)
 
     return sorted_modules
 
 
-def get_all_standard_modules(module=None, classes=None):
-    if module is None:
-        module = fup.modules
-    if classes is None:
-        classes = dict()
-    for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and "fup.modules" in str(obj):   # FIXME a little bit hacky...
-            classes[get_full_class_name(obj)] = obj
-        if inspect.ismodule(obj) and "fup.modules" in obj.__name__:
-            classes = get_all_standard_modules(module=obj, classes=classes)
-    return classes
-
-
 def get_module_start_values(config, profile_class=None, monitoring_class=None):
-    module_list = get_module_list(config)
+    module_list = get_sorted_modules(config)
     manager = fup.core.manager.Manager(config=config, module_list=module_list, profile_class=profile_class,
                                        monitoring_class=monitoring_class)
     manager.next_year()
@@ -118,7 +95,7 @@ def run_montecarlo(config, runs=100, profile_class=None, monitoring_class=None, 
 
     time_start = time.time()
 
-    module_list = get_module_list(config)
+    module_list = get_sorted_modules(config)
 
     dfs = []
     stats = []
@@ -150,7 +127,6 @@ def run_montecarlo(config, runs=100, profile_class=None, monitoring_class=None, 
 
     time_end = time.time()
     if debug:
-        print(f"Finished {runs} runs in {round(time_end-time_start, 2)}s")
+        print(f"Finished {runs} runs in {round(time_end - time_start, 2)}s")
 
     return df, df_stats
-

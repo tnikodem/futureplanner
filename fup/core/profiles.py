@@ -64,10 +64,10 @@ class DefaultProfile:
                 continue
             insurances += self.manager.modules[module_name].expenses
 
-        # print(f"""inc: {int(income)}({self.config["start_income"]}) exp: {int(expenses)}({self.config["start_expenses"]}) tax: {int(tax)} ({self.config["start_tax"]})""")
-
         years_till_retirement = max(0, (self.config["profile"]["retirement_year"] - self.manager.year))
-        years_in_retirenment = (self.config["simulation"]["end_year"] + 1 - max(self.manager.year, self.config["profile"]["retirement_year"]))
+        years_in_retirenment = (self.config["simulation"]["end_year"] + 1 - max(self.manager.year,
+                                                                                self.config["profile"][
+                                                                                    "retirement_year"]))
 
         # everything is *inflation corrected* money
 
@@ -90,9 +90,6 @@ class DefaultProfile:
         for i in range(years_in_retirenment):
             money_at_retirement /= inflation  # TODO also add interest
             money_at_retirement += income_wo_tax - expenses_wo_tax
-
-        # print(f"""{self.retired} {self.years_count}: +{int(income_wo_tax)} -{int(expenses_wo_tax)}: {int(self.manager.money)} -> {int(money_at_retirement)} ({self.money_level})""")
-        # print(f"""{self.retired} {self.years_count}: -{int(expenses_wo_tax)} <->  -{int(self.avg_working_expenses_wo_tax)}""")
 
         if money_at_retirement > self.config["profile"]["desired_money_buffer"] * 10:
             self.money_level += 5

@@ -109,17 +109,17 @@ class AssetModule(Module):
     def change(self, money):
         if money > 0:
             add_asset_value = 1
-            add_count = money / add_asset_value * (1-self.exchange_fee)
-            self.asset_value = (self.count*self.asset_value + add_count*add_asset_value) / \
+            add_count = money / add_asset_value * (1 - self.exchange_fee)
+            self.asset_value = (self.count * self.asset_value + add_count * add_asset_value) / \
                                (self.count + add_count)
             self.count += add_count
             return -money
         else:
             return_money = abs(money)
-            self.count -= return_money/self.asset_value
+            self.count -= return_money / self.asset_value
             if self.asset_value > 1:
-                return_money -= return_money * (self.asset_value-1)/self.asset_value * self.settlement_tax
-            return_money *= (1-self.exchange_fee)  # TODO before or after tax??!
+                return_money -= return_money * (self.asset_value - 1) / self.asset_value * self.settlement_tax
+            return_money *= (1 - self.exchange_fee)  # TODO before or after tax??!
             return return_money
 
     def change_value(self, relative_change):

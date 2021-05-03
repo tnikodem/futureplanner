@@ -18,4 +18,4 @@ class LuxuryExpenses(ChangeModule):
         total_inflation = self.get_prop("main.environment.Inflation", "total_inflation")
         self.expenses = total_inflation * self.start_expenses
         # adapt to money situation
-        self.expenses *= 1. + self.manager.profile.money_level/10.
+        self.expenses *= 1. + self.manager.profile.money_level / 10.

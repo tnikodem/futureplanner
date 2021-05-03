@@ -1,14 +1,15 @@
 import numpy as np
 from bokeh.plotting import figure
-from bokeh.models import NumeralTickFormatter
-from bokeh.models import Band, ColumnDataSource
-from bokeh.models import Legend, LegendItem
+from bokeh.models import NumeralTickFormatter, ColumnDataSource
+
 
 def percentile(n):
     def percentile_(x):
         return np.percentile(x, n)
+
     percentile_.__name__ = 'percentile_%s' % n
     return percentile_
+
 
 def create_plot(df, column, name, unit, color, legend_location="top_right"):
     dfg = df.groupby("year", as_index=False).agg({

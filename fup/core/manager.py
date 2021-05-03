@@ -1,13 +1,14 @@
 import collections
-from fup.core.functions import get_full_class_name
 from fup.core.monitoring import Monitoring
 from fup.core.profiles import DefaultProfile
+
 
 class ModuleConfig:
     def __init__(self, name, module_config, module_class):
         self.name = name
         self.module_config = module_config
         self.module_class = module_class
+
 
 class Manager:
     def __init__(self, config, module_list, monitoring_class=None, profile_class=None):
@@ -81,6 +82,3 @@ class Manager:
         self.monitoring.add_info(info_dict)
 
         return info_dict
-
-
-

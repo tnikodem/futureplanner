@@ -17,12 +17,12 @@ class Inflation(Module):
         if self.config["simulation"]["random"]:
             self.inflation = 1 + random.gauss(mu=self.mean_inflation, sigma=1) / 100
         else:
-            self.inflation = 1 + self.mean_inflation/100
+            self.inflation = 1 + self.mean_inflation / 100
 
         self.total_inflation *= self.inflation
 
     def get_extra_info(self):
-        return f"inflation: {round((self.inflation-1)*100,2)}"
+        return f"inflation: {round((self.inflation - 1) * 100, 2)}"
 
     def add_info(self, info_dict):
         info_dict["inflation"] = self.inflation

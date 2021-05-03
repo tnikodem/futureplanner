@@ -3,8 +3,9 @@ from fup.core.module import ChangeModule
 
 
 class InsuranceHealth(ChangeModule):
-    def __init__(self, fraction_of_income=0.073 ):
+    def __init__(self, fraction_of_income=0.073):
         self.fraction_of_income = fraction_of_income
+
     def next_year(self):
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
         self.expenses = income * self.fraction_of_income
@@ -68,7 +69,6 @@ class InsurancePension(ChangeModule):
             self.expenses = 0
 
 
-
 class InsuranceUnemployment(ChangeModule):
     def __init__(self):
         # Main properties
@@ -82,7 +82,7 @@ class InsuranceUnemployment(ChangeModule):
         salary_per_month = self.get_prop("main.work.Job", "salary_per_month")
         unemployed_months = self.get_prop("main.work.Job", "unemployed_months")
         unemployed_since = self.get_prop("main.work.Job", "unemployed_since")
-        #tax_rate = self.get_prop("main.taxes.Taxes", "tax_rate")
+        # tax_rate = self.get_prop("main.taxes.Taxes", "tax_rate")
         tax_rate = 0.3  # TODO better formula to get unemployment money, howver Prio B...
 
         if self.manager.year - birth_year > 50:
@@ -92,7 +92,7 @@ class InsuranceUnemployment(ChangeModule):
             self.income = 0
             self.expenses = 0
         elif unemployed_months < 1:
-            self.expenses = max(12-unemployed_months, 0) * salary_per_month * self.fraction_of_income
+            self.expenses = max(12 - unemployed_months, 0) * salary_per_month * self.fraction_of_income
         else:
             month_you_get_money = unemployed_months
             if unemployed_since - self.months_you_get_unemployment_money > 0:
@@ -100,4 +100,4 @@ class InsuranceUnemployment(ChangeModule):
             month_you_get_money = max(month_you_get_money, 0)
 
             self.income = month_you_get_money * salary_per_month * (1 - tax_rate) * self.salary_fraction
-            self.expenses = min(12-unemployed_months, 0) * salary_per_month * self.fraction_of_income
+            self.expenses = min(12 - unemployed_months, 0) * salary_per_month * self.fraction_of_income

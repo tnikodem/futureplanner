@@ -27,14 +27,14 @@ class Job(ChangeModule):
             return
 
         if self.config["simulation"]["random"]:
-            self.salary_per_month *=  (inflation + random.gauss(mu=.005, sigma=0.001))
+            self.salary_per_month *= (inflation + random.gauss(mu=.005, sigma=0.001))
             self.unemployed_months = 0
             for i in range(12):  # 12 months
                 if self.unemployed_since > 0:
-                    if random.random() < self.prob_find_job/100:
+                    if random.random() < self.prob_find_job / 100:
                         self.unemployed_since = 0
                 else:
-                    if random.random() < self.prob_lose_job/100.:
+                    if random.random() < self.prob_lose_job / 100.:
                         self.unemployed_since = 1
 
                 if self.unemployed_since > 0:

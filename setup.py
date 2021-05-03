@@ -30,9 +30,9 @@ setup(
     ],
     extras_require={
         'dev': [
-        'flake8==3.9.1',
-        'pytest==6.2.3',
-        'pytest-cov==2.11.1'
+            'flake8==3.9.1',
+            'pytest==6.2.3',
+            'pytest-cov==2.11.1'
         ]
     },
     # entry_points={

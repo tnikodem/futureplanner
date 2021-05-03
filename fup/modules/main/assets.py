@@ -26,7 +26,7 @@ class Stocks(AssetModule):
             self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
         else:
             self.asset_value *= 1 + self.value_increase_mean
-        self.change(money=-self.money_value*self.depot_costs)
+        self.change(money=-self.money_value * self.depot_costs)
 
     def add_info(self, info_dict):
         info_dict["stocks"] = self.money_value
@@ -48,7 +48,7 @@ class Gold(AssetModule):
             self.asset_value *= 1 + random.gauss(mu=self.value_increase_mean, sigma=self.value_increase_std)
         else:
             self.asset_value *= 1 + self.value_increase_mean
-        self.change(money=-self.money_value*self.depot_costs)
+        self.change(money=-self.money_value * self.depot_costs)
 
     def add_info(self, info_dict):
         info_dict["gold"] = self.money_value
