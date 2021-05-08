@@ -27,7 +27,7 @@ setup(
         'pandas==1.2.*',
         'bokeh==2.3.*',
         'ruamel.yaml==0.16.*',
-        'networkx=2.5.*'
+        'networkx==2.5.*'
     ],
     extras_require={
         'dev': [
