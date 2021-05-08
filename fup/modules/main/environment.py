@@ -3,10 +3,10 @@ from fup.core.module import Module
 
 
 class Inflation(Module):
-    def __init__(self, mean_inflation):
-        self.mean_inflation = mean_inflation
-        self.inflation = 1
-        self.total_inflation = 1
+#    def __init__(self, mean_inflation):
+#        self.mean_inflation = mean_inflation
+#        self.inflation = 1
+#        self.total_inflation = 1
 
     def next_year(self):
         # job_income = self.get_module(Job).income

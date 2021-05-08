@@ -39,28 +39,28 @@ modules:
   main.taxes.Taxes:
   main.work.Job:
     start_income: 42000
-  main.assets.Money:
+  assets.money.Money:
     start_money_value: 1000
-  main.assets.Stocks:
+  assets.stocks.Stocks:
     start_money_value: 0
-    settlement_tax: 0.25
+    gains_tax: 0.25
     exchange_fee: 0.005
     depot_costs: 0.002
     # MSCI WORLD since 1980 -- TODO exclude crisis events
     # Gross Total Return-Index includes dividends
     value_increase_mean: 0.092
     value_increase_std: 0.14
-  main.assets.Gold:
+  assets.resources.Gold:
     start_money_value: 0
     # no settlement tax, if gold is hold longer than 1 year
     # differntial tax on silver ~ 10% if bought, no tax if sold
-    settlement_tax: 0.
+    gains_tax: 0.
     exchange_fee: 0.05
     depot_costs: 0.01
     # Gold price since since 1950
     value_increase_mean: 0.076029
     value_increase_std: 0.231742
-  main.assets.Investment:
+  main.investment.Investment:
     run_end_of_year: True
     assets_stock_ratio: 0.3
     assets_gold_ratio: 0.1

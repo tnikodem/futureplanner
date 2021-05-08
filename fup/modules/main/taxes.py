@@ -3,16 +3,16 @@ from fup.core.module import ChangeModule
 
 
 class Taxes(ChangeModule):
-    def __init__(self):
-        self.tax_rate = 0
-
-        # freisteuer
-        self.tax_free_limit = 10000  # in €
-        self.max_tax_increase_limit = 100000  # in €
-        self.min_tax_rate = 0.14
-        self.max_tax_rate = 0.42  # + random.gauss(mu=0, sigma=0.03)
-
-        self.real_tax_factor = 1
+#    def __init__(self):
+#        self.tax_rate = 0
+#
+#        # freisteuer
+#        self.tax_free_limit = 10000  # in €
+#        self.max_tax_increase_limit = 100000  # in €
+#        self.min_tax_rate = 0.14
+#        self.max_tax_rate = 0.42  # + random.gauss(mu=0, sigma=0.03)
+#
+#        self.real_tax_factor = 1
 
     # TODO tax finetuning
     #    # adjust tax based on current tax

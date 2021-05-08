@@ -37,9 +37,7 @@ class Manager:
             self.profile = DefaultProfile(config=config, manager=self)
 
     def add_module(self, module):
-        self.modules[module.name] = module.module_class(**module.module_config)
-        super(module.module_class, self.modules[module.name]).__init__(name=module.name, manager=self)
-        self.modules[module.name].__init__(**module.module_config)  # TODO bit hacky??!
+        self.modules[module.name] = module.module_class(name=module.name, manager=self, **module.module_config)
 
     def get_module(self, module_name):
         return self.modules[module_name]
@@ -51,7 +49,7 @@ class Manager:
         for module_name in self.modules:
             self.modules[module_name].calc_next_year()
 
-        self.get_module("main.assets.Money").count += self.income - self.expenses
+        self.get_module("assets.money.Money").count += self.income - self.expenses
 
         self.profile.update()
         self.monitoring.next_year()

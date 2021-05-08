@@ -3,8 +3,8 @@ from fup.core.module import ChangeModule
 
 
 class InsuranceHealth(ChangeModule):
-    def __init__(self, fraction_of_income=0.073):
-        self.fraction_of_income = fraction_of_income
+#    def __init__(self, fraction_of_income=0.073):
+#        self.fraction_of_income = fraction_of_income
 
     def next_year(self):
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
@@ -12,8 +12,8 @@ class InsuranceHealth(ChangeModule):
 
 
 class InsuranceNursingCare(ChangeModule):
-    def __init__(self, fraction_of_income=0.0165):
-        self.fraction_of_income = fraction_of_income
+#    def __init__(self, fraction_of_income=0.0165):
+#        self.fraction_of_income = fraction_of_income
 
     def next_year(self):
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
@@ -24,12 +24,12 @@ class InsuranceNursingCare(ChangeModule):
 
 
 class InsurancePension(ChangeModule):
-    def __init__(self, start_entgeltpunkte):
-        self.entgeltpunkte = start_entgeltpunkte
-        self.new_entgeldpunkte = 0
-        self.durchschnittseinkommen = 38901  # 2019
-        self.rentenwert = 33 * 12  # 2019
-        self.fraction_of_income = 0.186 * 0.5
+#    def __init__(self, start_entgeltpunkte):
+#        self.entgeltpunkte = start_entgeltpunkte
+#        self.new_entgeldpunkte = 0
+#        self.durchschnittseinkommen = 38901  # 2019
+#        self.rentenwert = 33 * 12  # 2019
+#        self.fraction_of_income = 0.186 * 0.5
 
     @property
     def expected_income(self):
@@ -70,12 +70,12 @@ class InsurancePension(ChangeModule):
 
 
 class InsuranceUnemployment(ChangeModule):
-    def __init__(self):
-        # Main properties
-        self.salary_fraction = 0.6
-        # Helper properties
-        self.months_you_get_unemployment_money = 12
-        self.fraction_of_income = 0.024 * 0.5
+#    def __init__(self):
+#        # Main properties
+#        self.salary_fraction = 0.6
+#        # Helper properties
+#        self.months_you_get_unemployment_money = 12
+#        self.fraction_of_income = 0.024 * 0.5
 
     def next_year(self):
         birth_year = self.config["profile"]["birth_year"]

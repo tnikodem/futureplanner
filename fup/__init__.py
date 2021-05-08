@@ -9,5 +9,6 @@
 
 __version__ = '0.1'
 
-import fup.modules.main
+import fup.modules.assets
 import fup.modules.events
+import fup.modules.main

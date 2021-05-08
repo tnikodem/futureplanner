@@ -2,13 +2,17 @@ from fup.core.functions import get_full_class_name
 
 
 class Module:
-    def __init__(self, name="", manager=None):
+    def __init__(self, name="", manager=None, **kwargs):
         self.name = name
         self.manager = manager
         self.depends_on_modules = set()
         self.modifies_modules = set()
         self.dependency_check = False
         self.reset_values = dict()
+
+        for k, v in kwargs.items():
+            assert isinstance(k, str)
+            setattr(self, k, v)
 
     @property
     def config(self):
@@ -55,8 +59,8 @@ class Module:
 
 
 class ChangeModule(Module):
-    def __init__(self, name="", manager=None):
-        super().__init__(name=name, manager=manager)
+    def __init__(self, name="", manager=None, **kwargs):
+        super().__init__(name=name, manager=manager, **kwargs)
         self._expenses = 0
         self._expense_modifier = 1
         self._income = 0
@@ -94,12 +98,12 @@ class ChangeModule(Module):
 
 
 class AssetModule(Module):
-    def __init__(self, name="", manager=None):
-        super().__init__(name=name, manager=manager)
-        self.count = 0
+    def __init__(self, name="", manager=None, start_money_value=0, gains_tax=0, exchange_fee=0, **kwargs):
+        super().__init__(name=name, manager=manager, **kwargs)
+        self.count = start_money_value
         self.asset_value = 1
-        self.settlement_tax = 0
-        self.exchange_fee = 0
+        self.gains_tax = gains_tax
+        self.exchange_fee = exchange_fee
 
     @property
     def money_value(self):
@@ -108,17 +112,15 @@ class AssetModule(Module):
     # TODO check and unit test!!
     def change(self, money):
         if money > 0:
-            add_asset_value = 1
-            add_count = money / add_asset_value * (1 - self.exchange_fee)
-            self.asset_value = (self.count * self.asset_value + add_count * add_asset_value) / \
-                               (self.count + add_count)
-            self.count += add_count
+            add_money_value = money * (1-self.exchange_fee)
+            self.asset_value = (self.count * self.asset_value + add_money_value) / (self.count + add_money_value)
+            self.count += add_money_value
             return -money
         else:
             return_money = abs(money)
             self.count -= return_money / self.asset_value
             if self.asset_value > 1:
-                return_money -= return_money * (self.asset_value - 1) / self.asset_value * self.settlement_tax
+                return_money -= return_money * (self.asset_value - 1) / self.asset_value * self.gains_tax
             return_money *= (1 - self.exchange_fee)  # TODO before or after tax??!
             return return_money
 
