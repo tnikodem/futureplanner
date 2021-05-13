@@ -1,4 +1,3 @@
-import random
 from fup.core.module import ChangeModule
 
 
@@ -70,7 +69,6 @@ class InsuranceUnemployment(ChangeModule):
 
         # tax_rate = self.get_prop("main.taxes.Taxes", "tax_rate")
         salary_per_month = job_income / (12 - unemployed_months)
-        tax_rate = 0.3
         months_you_get_unemployment_money = self.months_you_get_unemployment_money
         if self.manager.year - birth_year > 50:
             months_you_get_unemployment_money = 24

@@ -84,4 +84,3 @@ def test_insurance_unemployment(default_manager):
     default_manager.next_year()
     assert default_manager.income == pytest.approx(15000 * 0.5)  # TODO check number with reality
     assert default_manager.expenses == pytest.approx(30000 * 0.024 * 0.5)
-

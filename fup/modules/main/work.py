@@ -3,16 +3,16 @@ from fup.core.module import ChangeModule
 
 
 class Job(ChangeModule):
-#    def __init__(self, start_income):
-#        self.salary_per_month = start_income / 12
-#        self.prob_lose_job = 1.
-#        self.prob_find_job = 10.
-#        # How much does it costs to find a new job?
-#        # Movement ?
-#        # Lower salary?
-#        # ... ?
-#        self.unemployed_since = 0
-#        self.unemployed_months = 0
+    #    def __init__(self, start_income):
+    #        self.salary_per_month = start_income / 12
+    #        self.prob_lose_job = 1.
+    #        self.prob_find_job = 10.
+    #        # How much does it costs to find a new job?
+    #        # Movement ?
+    #        # Lower salary?
+    #        # ... ?
+    #        self.unemployed_since = 0
+    #        self.unemployed_months = 0
 
     def next_year(self):
         inflation = self.get_prop("main.environment.Inflation", "inflation")

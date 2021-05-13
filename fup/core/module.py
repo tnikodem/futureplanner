@@ -115,7 +115,8 @@ class EventModule(Module):
                 info_dict["event"] = self.name
 
     def __repr__(self):
-        return f"""{get_full_class_name(self.__class__)}: active: {int(self.active)} start: {self.start_year} prob: {self.probability}"""
+        return f"{get_full_class_name(self.__class__)}: active: {int(self.active)} start: {self.start_year}" \
+               f" prob: {self.probability}"
 
 
 class ChangeModule(Module):

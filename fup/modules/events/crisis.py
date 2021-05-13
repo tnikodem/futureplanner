@@ -15,6 +15,7 @@ class OilCrisis1973(EventModule):
     Gold 400 (1973) -> 770 (1974) -> 660 (1975) https://www.macrotrends.net/1333/historical-gold-prices-100-year-chart
     >> Gold was legalised 1973 in USA!
     """
+
     def next_year(self):
         change_prob_lose_job = self.get_prop_changer("main.work.Job", "prob_lose_job")
         change_prob_find_job = self.get_prop_changer("main.work.Job", "prob_find_job")
@@ -50,5 +51,3 @@ class OilCrisis1973(EventModule):
                 change_mean_inflation(2.2 / 6.9)
             else:
                 self.active = False
-
-

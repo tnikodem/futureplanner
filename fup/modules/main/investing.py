@@ -3,9 +3,9 @@ from fup.core.module import ChangeModule
 
 
 class Investing(ChangeModule):
-#    def __init__(self, assets_stock_ratio, assets_gold_ratio):
-#        self.assets_stock_ratio = assets_stock_ratio
-#        self.assets_gold_ratio = assets_gold_ratio
+    #    def __init__(self, assets_stock_ratio, assets_gold_ratio):
+    #        self.assets_stock_ratio = assets_stock_ratio
+    #        self.assets_gold_ratio = assets_gold_ratio
 
     def next_year(self):
         self.expenses = 0

@@ -3,27 +3,27 @@ from fup.core.manager import Manager
 from fup.core.module import ChangeModule, AssetModule
 
 
-class TestChange1(ChangeModule):
+class Change1(ChangeModule):
     def next_year(self):
         self.value1 += 1
         self.expenses = self.value1
 
 
-class TestChange2(ChangeModule):
+class Change2(ChangeModule):
     def next_year(self):
         value1 = self.get_prop("test1", "value1")
         self.value2 += value1
         self.expenses = self.value2
 
 
-class TestChange3(ChangeModule):
+class Change3(ChangeModule):
     def next_year(self):
         change_value1 = self.get_prop_changer("test1", "value1")
         change_value1(2)
         self.income = 100
 
 
-class TestAsset(AssetModule):
+class Asset(AssetModule):
     pass
 
 
@@ -33,10 +33,10 @@ def test_manager(default_config):
     assert manager is not None
     # manager with modules
     module_list = [
-        ModuleConfig(name="test3", module_config={"value2": 3}, module_class=TestChange3),
-        ModuleConfig(name="test1", module_config={"value1": 1}, module_class=TestChange1),
-        ModuleConfig(name="test2", module_config={"value2": 2}, module_class=TestChange2),
-        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=TestAsset),
+        ModuleConfig(name="test3", module_config={"value2": 3}, module_class=Change3),
+        ModuleConfig(name="test1", module_config={"value1": 1}, module_class=Change1),
+        ModuleConfig(name="test2", module_config={"value2": 2}, module_class=Change2),
+        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=Asset),
     ]
     manager = Manager(config=default_config, module_list=module_list)
     assert manager is not None
