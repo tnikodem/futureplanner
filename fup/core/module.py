@@ -83,6 +83,8 @@ class ChangeModule(Module):
         self._income = value
 
     def calc_next_year(self):
+        self.income = 0
+        self.expenses = 0
         self.next_year()
         self.manager.income += self.income
         self.manager.expenses += self.expenses
@@ -109,7 +111,6 @@ class AssetModule(Module):
     def money_value(self):
         return self.count * self.asset_value
 
-    # TODO check and unit test!!
     def change(self, money):
         if money > 0:
             add_money_value = money * (1-self.exchange_fee)
@@ -117,11 +118,12 @@ class AssetModule(Module):
             self.count += add_money_value
             return -money
         else:
-            return_money = abs(money)
-            self.count -= return_money / self.asset_value
-            if self.asset_value > 1:
-                return_money -= return_money * (self.asset_value - 1) / self.asset_value * self.gains_tax
-            return_money *= (1 - self.exchange_fee)  # TODO before or after tax??!
+            asset_count = abs(money) / self.asset_value
+            self.count -= asset_count
+            asset_value_with_fee = self.asset_value * (1 - self.exchange_fee)
+            return_money = asset_value_with_fee * asset_count
+            if asset_value_with_fee > 1:
+                return_money *= 1 - (asset_value_with_fee - 1) / asset_value_with_fee * self.gains_tax
             return return_money
 
     def change_value(self, relative_change):
@@ -133,4 +135,4 @@ class AssetModule(Module):
         return out_dict
 
     def __repr__(self):
-        return f"""{get_full_class_name(self.__class__)}: count: {self.income} value: {int(self.get_money_value())}€"""
+        return f"""{get_full_class_name(self.__class__)}: {int(self.money_value)}€"""

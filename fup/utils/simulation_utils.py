@@ -2,7 +2,8 @@ import time
 import copy
 import pandas as pd
 import networkx as nx
-from fup.core.manager import Manager, ModuleConfig
+from fup.core.config import ModuleConfig
+from fup.core.manager import Manager
 from fup.core.functions import get_all_modules
 import fup.modules
 
