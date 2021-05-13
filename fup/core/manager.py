@@ -1,9 +1,10 @@
 import collections
+import copy
 
 
 class Manager:
     def __init__(self, config, module_list, monitoring_class=None, profile_class=None):
-        self.config = config
+        self.config = copy.deepcopy(config)
 
         # Globals
         self.year = config["simulation"]["start_year"]

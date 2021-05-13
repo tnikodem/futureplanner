@@ -41,7 +41,8 @@ modules:
     start_income: 42000
   assets.money.Money:
     start_money_value: 1000
-  assets.stocks.Stocks:
+  stocks:
+    class: assets.investment.Standard
     start_money_value: 0
     gains_tax: 0.25
     exchange_fee: 0.005
@@ -50,7 +51,8 @@ modules:
     # Gross Total Return-Index includes dividends
     value_increase_mean: 0.092
     value_increase_std: 0.14
-  assets.resources.Gold:
+  gold:
+    class: assets.investment.Standard
     start_money_value: 0
     # no settlement tax, if gold is hold longer than 1 year
     # differntial tax on silver ~ 10% if bought, no tax if sold

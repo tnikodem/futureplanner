@@ -58,6 +58,66 @@ class Module:
         return f"""{get_full_class_name(self.__class__)}"""
 
 
+class AssetModule(Module):
+    def __init__(self, name="", manager=None, start_money_value=0, gains_tax=0, exchange_fee=0, **kwargs):
+        super().__init__(name=name, manager=manager, **kwargs)
+        self.count = start_money_value
+        self.asset_value = 1
+        self.gains_tax = gains_tax
+        self.exchange_fee = exchange_fee
+
+    @property
+    def money_value(self):
+        return self.count * self.asset_value
+
+    def change(self, money):
+        if money > 0:
+            add_money_value = money * (1 - self.exchange_fee)
+            self.asset_value = (self.count * self.asset_value + add_money_value) / (self.count + add_money_value)
+            self.count += add_money_value
+            return -money
+        else:
+            asset_count = abs(money) / self.asset_value
+            self.count -= asset_count
+            asset_value_with_fee = self.asset_value * (1 - self.exchange_fee)
+            return_money = asset_value_with_fee * asset_count
+            if asset_value_with_fee > 1:
+                return_money *= 1 - (asset_value_with_fee - 1) / asset_value_with_fee * self.gains_tax
+            return return_money
+
+    def change_value(self, relative_change):
+        self.asset_value *= relative_change
+
+    def info_dict(self):
+        out_dict = super().info_dict()
+        out_dict["value"] = self.money_value
+        return out_dict
+
+    def __repr__(self):
+        return f"""{get_full_class_name(self.__class__)}: {int(self.money_value)}€"""
+
+
+class EventModule(Module):
+    def __init__(self, name="", manager=None, start_year=None, probability=None, **kwargs):
+        super().__init__(name=name, manager=manager, **kwargs)
+        self.start_year = start_year
+        self.probability = probability
+        self.active = False
+
+    def get_extra_info(self):
+        return f"start: {self.start_year}"
+
+    def add_info(self, info_dict):
+        if self.active:
+            if "event" in info_dict:
+                info_dict["event"] += "," + self.name
+            else:
+                info_dict["event"] = self.name
+
+    def __repr__(self):
+        return f"""{get_full_class_name(self.__class__)}: active: {int(self.active)} start: {self.start_year} prob: {self.probability}"""
+
+
 class ChangeModule(Module):
     def __init__(self, name="", manager=None, **kwargs):
         super().__init__(name=name, manager=manager, **kwargs)
@@ -97,42 +157,3 @@ class ChangeModule(Module):
 
     def __repr__(self):
         return f"""{get_full_class_name(self.__class__)}: income: {int(self.income)}€ expenses: {int(self.expenses)}€"""
-
-
-class AssetModule(Module):
-    def __init__(self, name="", manager=None, start_money_value=0, gains_tax=0, exchange_fee=0, **kwargs):
-        super().__init__(name=name, manager=manager, **kwargs)
-        self.count = start_money_value
-        self.asset_value = 1
-        self.gains_tax = gains_tax
-        self.exchange_fee = exchange_fee
-
-    @property
-    def money_value(self):
-        return self.count * self.asset_value
-
-    def change(self, money):
-        if money > 0:
-            add_money_value = money * (1-self.exchange_fee)
-            self.asset_value = (self.count * self.asset_value + add_money_value) / (self.count + add_money_value)
-            self.count += add_money_value
-            return -money
-        else:
-            asset_count = abs(money) / self.asset_value
-            self.count -= asset_count
-            asset_value_with_fee = self.asset_value * (1 - self.exchange_fee)
-            return_money = asset_value_with_fee * asset_count
-            if asset_value_with_fee > 1:
-                return_money *= 1 - (asset_value_with_fee - 1) / asset_value_with_fee * self.gains_tax
-            return return_money
-
-    def change_value(self, relative_change):
-        self.asset_value *= relative_change
-
-    def info_dict(self):
-        out_dict = super().info_dict()
-        out_dict["value"] = self.money_value
-        return out_dict
-
-    def __repr__(self):
-        return f"""{get_full_class_name(self.__class__)}: {int(self.money_value)}€"""

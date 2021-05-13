@@ -2,7 +2,7 @@ import random
 from fup.core.module import ChangeModule
 
 
-class Investment(ChangeModule):
+class Investing(ChangeModule):
 #    def __init__(self, assets_stock_ratio, assets_gold_ratio):
 #        self.assets_stock_ratio = assets_stock_ratio
 #        self.assets_gold_ratio = assets_gold_ratio

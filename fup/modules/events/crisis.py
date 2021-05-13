@@ -1,8 +1,8 @@
 import random
-from fup.core.module import ChangeModule
+from fup.core.module import EventModule
 
 
-class OilCrisis1973(ChangeModule):
+class OilCrisis1973(EventModule):
     """
     https://en.wikipedia.org/wiki/1973_oil_crisis
     Stagflation
@@ -15,12 +15,6 @@ class OilCrisis1973(ChangeModule):
     Gold 400 (1973) -> 770 (1974) -> 660 (1975) https://www.macrotrends.net/1333/historical-gold-prices-100-year-chart
     >> Gold was legalised 1973 in USA!
     """
-
-    def __init__(self, start_year=None, probability=None):
-        self.start_year = start_year
-        self.probability = probability
-        self.active = False
-
     def next_year(self):
         change_prob_lose_job = self.get_prop_changer("main.work.Job", "prob_lose_job")
         change_prob_find_job = self.get_prop_changer("main.work.Job", "prob_find_job")
@@ -57,12 +51,4 @@ class OilCrisis1973(ChangeModule):
             else:
                 self.active = False
 
-    def get_extra_info(self):
-        return f"start: {self.start_year}"
 
-    def add_info(self, info_dict):
-        if self.active:
-            if "crisis" in info_dict:
-                info_dict["crisis"] += "," + self.name
-            else:
-                info_dict["crisis"] = self.name
