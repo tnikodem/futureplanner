@@ -5,7 +5,7 @@ from fup.profiles import profiles
 from fup.core.module import AssetModule
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def default_config():
     return {
         "simulation": {

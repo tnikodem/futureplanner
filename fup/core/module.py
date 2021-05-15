@@ -147,6 +147,10 @@ class ChangeModule(Module):
         self.income = 0
         self.expenses = 0
         self.next_year()
+
+        # TODO write better
+        self.manager.get_module("assets.money.Money").count += self.income - self.expenses
+
         self.manager.income += self.income
         self.manager.expenses += self.expenses
 

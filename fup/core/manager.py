@@ -40,8 +40,6 @@ class Manager:
         for module_name in self.modules:
             self.modules[module_name].calc_next_year()
 
-        self.get_module("assets.money.Money").count += self.income - self.expenses
-
         if self.profile:
             self.profile.update()
         if self.monitoring:
@@ -59,10 +57,6 @@ class Manager:
             if hasattr(self.modules[module_name], 'money_value'):
                 total_assets += self.modules[module_name].money_value
         return total_assets
-
-    # TODO move directly to monitoring
-    # def get_stats(self):
-    #     return self.monitoring.get_final_stats()
 
     def get_df_row(self):
         info_dict = dict(year=self.year,

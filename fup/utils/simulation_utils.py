@@ -4,45 +4,18 @@ import pandas as pd
 import networkx as nx
 from fup.core.config import ModuleConfig
 from fup.core.manager import Manager
-from fup.core.functions import get_all_modules
+from fup.core.functions import get_module_config_list
+from fup.profiles import profiles
 import fup.modules
 
 
-def get_module_list(config, end_of_year=False):
-    config = copy.deepcopy(config)  # dict is "cleaned"
-    standard_modules = get_all_modules(module=fup.modules)
-
-    module_list = []
-    for name in config["modules"].keys():
-        module_config = config["modules"][name]
-        if module_config is None:
-            module_config = {}
-
-        if end_of_year:
-            if "run_end_of_year" not in module_config or not module_config["run_end_of_year"]:
-                continue
-            del module_config["run_end_of_year"]
-        else:
-            if "run_end_of_year" in module_config and module_config["run_end_of_year"]:
-                continue
-
-        if "class" in module_config:
-            module_class = standard_modules[module_config["class"]]
-            del module_config["class"]
-        else:
-            module_class = standard_modules[name]
-        module_list += [ModuleConfig(name=name,
-                                     module_config=module_config,
-                                     module_class=module_class
-                                     )]
-    return module_list
-
-
-def get_sorted_modules(config):
-    module_list = get_module_list(config=config)
+def get_sorted_module_config_list(config):
+    # TODO put somewhere else, where??!
+    # imports Manager -> no cyclic imports!
+    module_list = get_module_config_list(config=config, root_module=fup.modules)
 
     # dry run to get dependencies
-    manager = Manager(config, module_list)
+    manager = Manager(config, module_list, profile_class=profiles.Test)
     manager.dependency_check()
     G = nx.DiGraph()
     G.add_node("root")
@@ -72,31 +45,29 @@ def get_sorted_modules(config):
     for module_name in dep_checked_list:
         sorted_modules += [m for m in module_list if m.name == module_name]
 
-    sorted_modules += get_module_list(config, end_of_year=True)
+    sorted_modules += get_module_config_list(config=config, root_module=fup.modules, end_of_year=True)
 
     return sorted_modules
 
 
-def get_module_start_values(config, profile_class=None, monitoring_class=None):
-    module_list = get_sorted_modules(config)
-    manager = fup.core.manager.Manager(config=config, module_list=module_list, profile_class=profile_class,
+def get_start_values(config, profile_class, monitoring_class=None):
+    sorted_module_config_list = get_sorted_module_config_list(config=config)
+    manager = fup.core.manager.Manager(config=config, module_list=sorted_module_config_list,
+                                       profile_class=profile_class,
                                        monitoring_class=monitoring_class)
     manager.next_year()
-
-    dicts = []
+    rows = []
     for module_name in manager.modules:
-        dicts += [manager.modules[module_name].info_dict()]
-    df_mods = pd.DataFrame(dicts)
-
-    return df_mods
+        rows += [manager.modules[module_name].info_dict()]
+    return pd.DataFrame(rows)
 
 
-def run_montecarlo(config, runs=100, profile_class=None, monitoring_class=None, debug=False):
+def run_simulations(config, runs=100, profile_class=None, monitoring_class=None, debug=False):
     config = copy.deepcopy(config)
 
     time_start = time.time()
 
-    module_list = get_sorted_modules(config)
+    module_list = get_sorted_module_config_list(config)
 
     dfs = []
     stats = []

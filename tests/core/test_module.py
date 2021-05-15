@@ -39,9 +39,8 @@ class Change2(ChangeModule):
         self.expenses = 100
 
 
-def test_change_module(default_config):
-    manager = Manager(config=default_config, module_list=[])
-
+def test_change_module(default_manager):
+    manager = default_manager
     manager.add_module(ModuleConfig(name="test", module_config={}, module_class=Change1))
     cmod = manager.get_module("test")
     cmod.calc_next_year()
