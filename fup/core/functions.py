@@ -61,5 +61,3 @@ def get_module_config_list(root_module, config, end_of_year=False):
                                      module_class=module_class
                                      )]
     return module_list
-
-

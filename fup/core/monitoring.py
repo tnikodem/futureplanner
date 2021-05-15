@@ -1,3 +1,5 @@
+# TODO really necessary? all remaining strongly depends only on profile
+
 class Monitoring:
     def __init__(self, manager):
         self.manager = manager
@@ -14,11 +16,6 @@ class Monitoring:
 
         if self.manager.profile.money_level < -3:
             self.money_levels_below_m3 += 1
-
-    def add_info(self, info_dict):
-        info_dict["retired"] = self.manager.profile.retired
-        info_dict["money_level"] = self.manager.profile.money_level
-        info_dict["assets"] = self.manager.total_assets
 
     def get_final_stats(self):
         return dict(unemployed_months=self.unemployed_months,

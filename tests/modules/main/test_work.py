@@ -18,14 +18,14 @@ def test_taxes(default_manager):
     }
     default_manager.add_module(ModuleConfig(name="Job", module_config=job_module_config, module_class=Job))
     default_manager.next_year()
-    assert default_manager.income == pytest.approx(30000 * 1.02)
+    assert default_manager.df_row["income"] == pytest.approx(30000 * 1.02)
 
     default_manager.config["simulation"]["random"] = True
     random.seed(42)
     default_manager.next_year()
     assert default_manager.get_module("Job").unemployed_months == 12
     assert default_manager.get_module("Job").unemployed_months_this_year == 12
-    assert default_manager.income == pytest.approx(0)
+    assert default_manager.df_row["income"] == pytest.approx(0)
 
     # FIXME highly unstable test with several random numbers!
     random.seed(42)
@@ -34,9 +34,9 @@ def test_taxes(default_manager):
     default_manager.next_year()
     assert default_manager.get_module("Job").unemployed_months_this_year == 5
     assert default_manager.get_module("Job").unemployed_months == 0
-    assert default_manager.income == pytest.approx(1.02**3 * 30000 * (12-5)/12)
+    assert default_manager.df_row["income"] == pytest.approx(1.02 ** 3 * 30000 * (12 - 5) / 12)
 
     # TODO No Money when retired ?! part time Job??!
     default_manager.profile.retired = True
     default_manager.next_year()
-    assert default_manager.income == pytest.approx(0)
+    assert default_manager.df_row["income"] == pytest.approx(0)

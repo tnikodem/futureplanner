@@ -10,6 +10,5 @@ class Standard(AssetModule):
             self.asset_value *= 1 + self.value_increase_mean
         self.change(money=-self.money_value * self.depot_costs)
 
-    def add_info(self, info_dict):
         if hasattr(self, "info_name"):
-            info_dict[self.info_name] = self.money_value
+            self.df_row[self.info_name] = self.money_value

@@ -12,9 +12,6 @@ class Test:
     def update(self):
         self.retired = self.manager.year >= self.config["profile"]["retirement_year"]
 
-    def add_info(self, info_dict):
-        pass
-
 
 class Default:
     def __init__(self, manager, config):
@@ -43,9 +40,6 @@ class Default:
         # money level is calculated in an iterative approach.
         # depending on your expenses of last years it is tried
         # to match your future expenses such that an equal level is achieved
-
-    def add_info(self, info_dict):
-        pass
 
     # update once per year, or if necessary more often
     def update(self):
@@ -107,7 +101,9 @@ class Default:
         # update history values
         self.avg_working_expenses_wo_tax *= inflation
         if not self.retired:
-            self.avg_working_expenses_wo_tax = (self.avg_working_expenses_wo_tax * self.years_count + expenses - tax - insurances) / (self.years_count + 1)
+            self.avg_working_expenses_wo_tax = (
+                                                           self.avg_working_expenses_wo_tax * self.years_count + expenses - tax - insurances) / (
+                                                           self.years_count + 1)
 
         # set own values
         self.years_count += 1

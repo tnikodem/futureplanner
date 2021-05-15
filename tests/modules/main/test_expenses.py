@@ -12,13 +12,9 @@ def test_inflation_sensitive(default_manager):
                                                                         }, module_class=InflationSensitive))
     default_manager.add_module(ModuleConfig(name="test2", module_config={"start_expenses": 0,
                                                                          }, module_class=InflationSensitive))
-    df_row = default_manager.get_df_row()
-    assert df_row["test"] == 0
-    # next year
     default_manager.next_year()
-    df_row = default_manager.get_df_row()
-    assert df_row["test"] == 1100
-    assert default_manager.expenses == 1100
+    assert default_manager.df_row["test"] == 1100
+    assert default_manager.df_row["expenses"] == 1100
 
 
 def test_inflation_sensitive_variable(default_manager):
@@ -30,10 +26,6 @@ def test_inflation_sensitive_variable(default_manager):
                                                                         }, module_class=InflationSensitiveVariable))
     default_manager.add_module(ModuleConfig(name="test2", module_config={"start_expenses": 0,
                                                                          }, module_class=InflationSensitiveVariable))
-    df_row = default_manager.get_df_row()
-    assert df_row["test"] == 0
-    # next year
     default_manager.next_year()
-    df_row = default_manager.get_df_row()
-    assert df_row["test"] == 2200
-    assert default_manager.expenses == 2200
+    assert default_manager.df_row["test"] == 2200
+    assert default_manager.df_row["expenses"] == 2200

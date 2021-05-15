@@ -17,9 +17,8 @@ class Inflation(Module):
             self.inflation = 1 + self.inflation_mean / 100
         self.total_inflation *= self.inflation
 
+        self.df_row["inflation"] = self.inflation
+        self.df_row["total_inflation"] = self.total_inflation
+
     def get_extra_info(self):
         return f"inflation: {round((self.inflation - 1) * 100, 2)}"
-
-    def add_info(self, info_dict):
-        info_dict["inflation"] = self.inflation
-        info_dict["total_inflation"] = self.total_inflation

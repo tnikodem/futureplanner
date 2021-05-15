@@ -10,11 +10,10 @@ from fup.modules.assets.investment import Standard
 
 def test_money(default_config):
     manager = Manager(config=default_config, module_list=[])
-    manager.add_module(ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 500}, module_class=Money))
-    df_row = manager.get_df_row()
-    assert df_row["money"] == pytest.approx(500)
-    # next year
+    manager.add_module(
+        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 500}, module_class=Money))
     manager.next_year()
+    assert manager.df_row["money"] == pytest.approx(500)
     assert manager.total_assets == pytest.approx(500)
 
 
@@ -34,12 +33,10 @@ def test_standard(default_manager):
                                                                          "value_increase_mean": 0.1,
                                                                          "value_increase_std": 0.04,
                                                                          }, module_class=Standard))
-    df_row = default_manager.get_df_row()
-    assert df_row["test"] == 1000
-    # next year
     default_manager.next_year()
-    assert default_manager.total_assets == pytest.approx((1000+100)*(1-0.01))
-    # random next year
+    assert default_manager.df_row["test"] == pytest.approx(1000 * 1.1 * (1 - 0.01))
+    assert default_manager.total_assets == pytest.approx((1000 + 100) * (1 - 0.01))
+    # random
     random.seed(42)
     default_manager.config["simulation"]["random"] = True
     default_manager.next_year()

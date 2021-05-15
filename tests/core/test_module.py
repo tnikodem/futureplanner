@@ -23,15 +23,16 @@ def test_module(default_config):
     assert manager.get_module("test2").test_parm == 246
 
     # info dict
-    info_dict = manager.get_module("test2").info_dict()
-    assert info_dict["name"] == "test2"
-    assert info_dict["class"] == "core.module.Module"
-    assert info_dict["info"] == ""
+    info = manager.get_module("test2").info
+    assert info["name"] == "test2"
+    assert info["class"] == "core.module.Module"
+    assert info["info"] == ""
 
 
 class Change1(ChangeModule):
     def next_year(self):
         self.income = 1000
+        self.expenses = 500
 
 
 class Change2(ChangeModule):
@@ -43,22 +44,22 @@ def test_change_module(default_manager):
     manager = default_manager
     manager.add_module(ModuleConfig(name="test", module_config={}, module_class=Change1))
     cmod = manager.get_module("test")
-    cmod.calc_next_year()
-    assert manager.income == 43000
-    assert manager.expenses == 35000
+    cmod.next_year_wrapper()
+    assert manager.df_row["income"] == 1000
+    assert manager.df_row["expenses"] == 500
     manager.add_module(ModuleConfig(name="test2", module_config={}, module_class=Change2))
     cmod2 = manager.get_module("test2")
-    cmod2.calc_next_year()
-    assert manager.income == 43000
-    assert manager.expenses == 35100
+    cmod2.next_year_wrapper()
+    assert manager.df_row["income"] == 1000
+    assert manager.df_row["expenses"] == 600
 
-    # info dict
-    info_dict = cmod.info_dict()
-    assert info_dict["name"] == "test"
-    assert info_dict["class"] == "test_module.Change1"
-    assert info_dict["info"] == ""
-    assert info_dict["income"] == 1000
-    assert info_dict["expenses"] == 0
+    # info
+    info = cmod.info
+    assert info["name"] == "test"
+    assert info["class"] == "test_module.Change1"
+    assert info["info"] == ""
+    assert info["income"] == 1000
+    assert info["expenses"] == 500
 
 
 def test_assets_module(default_config):
@@ -106,13 +107,13 @@ def test_assets_module(default_config):
     # other half with gain 2
     value_with_fee_2 = 2 * (1 - exchange_fee)
     assert amod.change(money=-14400) == pytest.approx((14400. - (
-                7200. * (value_with_fee_1 - 1) / value_with_fee_1 + 7200. * (
-                  value_with_fee_2 - 1) / value_with_fee_2) * gains_tax) * (1. - exchange_fee))
+            7200. * (value_with_fee_1 - 1) / value_with_fee_1 + 7200. * (
+            value_with_fee_2 - 1) / value_with_fee_2) * gains_tax) * (1. - exchange_fee))
     assert amod.money_value == 14400
 
     # info dict
-    info_dict = amod.info_dict()
-    assert info_dict["name"] == "test"
-    assert info_dict["class"] == "core.module.AssetModule"
-    assert info_dict["info"] == ""
-    assert info_dict["value"] == 14400
+    info = amod.info
+    assert info["name"] == "test"
+    assert info["class"] == "core.module.AssetModule"
+    assert info["info"] == ""
+    assert info["value"] == 14400

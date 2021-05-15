@@ -58,47 +58,43 @@ def get_start_values(config, profile_class, monitoring_class=None):
     manager.next_year()
     rows = []
     for module_name in manager.modules:
-        rows += [manager.modules[module_name].info_dict()]
+        rows += [manager.modules[module_name].info]
     return pd.DataFrame(rows)
 
 
 def run_simulations(config, runs=100, profile_class=None, monitoring_class=None, debug=False):
-    config = copy.deepcopy(config)
-
     time_start = time.time()
 
-    module_list = get_sorted_module_config_list(config)
+    sorted_module_config_list = get_sorted_module_config_list(config)
 
     dfs = []
     stats = []
     for i in range(runs):
-        manager = fup.core.manager.Manager(config=config, module_list=module_list,
+        manager = fup.core.manager.Manager(config=config, module_list=sorted_module_config_list,
                                            profile_class=profile_class, monitoring_class=monitoring_class)
 
-        df_rows = []
+        rows = []
         for i_year in range(config["simulation"]["end_year"] - config["simulation"]["start_year"]):
             manager.next_year()
-            df_rows += [manager.get_df_row()]
-        df = pd.DataFrame(df_rows)
-
+            rows += [manager.df_row]
+        df = pd.DataFrame(rows)
         df["run"] = i
 
         # tax correction
-        df["expenses_net"] = df["expenses"] - df["tax"] - df["insurances"]
-        df["income_net"] = df["income"] - df["tax"] - df["insurances"]
+        df["expenses_net"] = df["expenses"] - df["tax"] - df["tax_offset"]
+        df["income_net"] = df["income"] - df["tax"] - df["tax_offset"]
         # Inflation corrected
         df["expenses_net_cor"] = df["expenses_net"] / df["total_inflation"]
         df["income_net_cor"] = df["income_net"] / df["total_inflation"]
         df["assets_cor"] = df["assets"] / df["total_inflation"]
 
         dfs += [df]
-        stats += [manager.get_stats()]
+        # TODO implement me stats += [manager.get_stats()]
 
     df = pd.concat(dfs)
     df_stats = pd.DataFrame(stats)
 
-    time_end = time.time()
     if debug:
-        print(f"Finished {runs} runs in {round(time_end - time_start, 2)}s")
+        print(f"Finished {runs} runs in {round(time.time() - time_start, 2)}s")
 
     return df, df_stats

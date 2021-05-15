@@ -18,6 +18,18 @@ class Module:
     def config(self):
         return self.manager.config
 
+    @property
+    def df_row(self):
+        return self.manager.df_row
+
+    @property
+    def info(self):
+        return {
+            "name": self.name,
+            "class": get_full_class_name(self.__class__),
+            "info": self.get_extra_info()
+        }
+
     def get_prop(self, module_name, prop_name):
         if self.dependency_check:
             self.depends_on_modules.add(module_name)
@@ -34,25 +46,15 @@ class Module:
         return lambda x: self.manager.get_module(module_name).change_prop(prop_name=prop_name, change_value=x)
 
     # wrapper which can be overwritten by submodule class
-    def calc_next_year(self):
+    def next_year_wrapper(self):
         self.next_year()
 
     # Implemented by each module definition
     def next_year(self):
         pass
 
-    def add_info(self, info_dict):
-        pass
-
     def get_extra_info(self):
         return ""
-
-    def info_dict(self):
-        return {
-            "name": self.name,
-            "class": get_full_class_name(self.__class__),
-            "info": self.get_extra_info()
-        }
 
     def __repr__(self):
         return f"""{get_full_class_name(self.__class__)}"""
@@ -69,6 +71,12 @@ class AssetModule(Module):
     @property
     def money_value(self):
         return self.count * self.asset_value
+
+    @property
+    def info(self):
+        out_dict = super().info
+        out_dict["value"] = self.money_value
+        return out_dict
 
     def change(self, money):
         if money > 0:
@@ -88,10 +96,9 @@ class AssetModule(Module):
     def change_value(self, relative_change):
         self.asset_value *= relative_change
 
-    def info_dict(self):
-        out_dict = super().info_dict()
-        out_dict["value"] = self.money_value
-        return out_dict
+    def next_year_wrapper(self):
+        self.next_year()
+        self.df_row["assets"] = self.df_row.get("assets", 0) + self.money_value
 
     def __repr__(self):
         return f"""{get_full_class_name(self.__class__)}: {int(self.money_value)}€"""
@@ -107,12 +114,13 @@ class EventModule(Module):
     def get_extra_info(self):
         return f"start: {self.start_year}"
 
-    def add_info(self, info_dict):
+    def next_year_wrapper(self):
+        self.next_year()
         if self.active:
-            if "event" in info_dict:
-                info_dict["event"] += "," + self.name
+            if "event" in self.df_row:
+                self.df_row["event"] += "," + self.name
             else:
-                info_dict["event"] = self.name
+                self.df_row["event"] = self.name
 
     def __repr__(self):
         return f"{get_full_class_name(self.__class__)}: active: {int(self.active)} start: {self.start_year}" \
@@ -143,22 +151,23 @@ class ChangeModule(Module):
     def income(self, value):
         self._income = value
 
-    def calc_next_year(self):
-        self.income = 0
-        self.expenses = 0
-        self.next_year()
-
-        # TODO write better
-        self.manager.get_module("assets.money.Money").count += self.income - self.expenses
-
-        self.manager.income += self.income
-        self.manager.expenses += self.expenses
-
-    def info_dict(self):
-        out_dict = super().info_dict()
+    @property
+    def info(self):
+        out_dict = super().info
         out_dict["income"] = self.income
         out_dict["expenses"] = self.expenses
         return out_dict
+
+    def next_year_wrapper(self):
+        self.income = 0
+        self.expenses = 0
+
+        self.next_year()
+        # TODO write better, how?!
+        self.manager.get_module("assets.money.Money").count += self.income - self.expenses
+
+        self.df_row["income"] = self.df_row.get("income", 0) + self.income
+        self.df_row["expenses"] = self.df_row.get("expenses", 0) + self.expenses
 
     def __repr__(self):
         return f"""{get_full_class_name(self.__class__)}: income: {int(self.income)}€ expenses: {int(self.expenses)}€"""
