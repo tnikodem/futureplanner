@@ -19,7 +19,7 @@ class OilCrisis1973(EventModule):
     def next_year(self):
         change_prob_lose_job = self.get_prop_changer("main.work.Job", "prob_lose_job")
         change_prob_find_job = self.get_prop_changer("main.work.Job", "prob_find_job")
-        change_mean_inflation = self.get_prop_changer("main.environment.Inflation", "mean_inflation")
+        change_mean_inflation = self.get_prop_changer("main.environment.Inflation", "inflation_mean")
         change_gold_value = self.get_prop_changer("assets.resources.Gold", "asset_value")
         change_stocks_value = self.get_prop_changer("assets.stocks.Stocks", "asset_value")
 

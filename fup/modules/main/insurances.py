@@ -1,22 +1,22 @@
 from fup.core.module import ChangeModule
 
 
-class InsuranceHealth(ChangeModule):
+class Health(ChangeModule):
     def next_year(self):
-        income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
+        income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.Pension", "income")
         self.expenses = income * self.fraction_of_income
 
 
-class InsuranceNursingCare(ChangeModule):
+class NursingCare(ChangeModule):
     def next_year(self):
-        income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.InsurancePension", "income")
+        income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.Pension", "income")
         if self.manager.profile.retired:
             self.expenses = income * self.fraction_of_income * self.retirement_factor
         else:
             self.expenses = income * self.fraction_of_income
 
 
-class InsurancePension(ChangeModule):
+class Pension(ChangeModule):
     @property
     def expected_income(self):
         # expect to have similar income until retirement
@@ -58,28 +58,28 @@ class InsurancePension(ChangeModule):
             self.expenses = 0
 
 
-class InsuranceUnemployment(ChangeModule):
+class Unemployment(ChangeModule):
     def next_year(self):
         birth_year = self.config["profile"]["birth_year"]
+        salary_per_month = self.get_prop("main.work.Job", "salary_per_month")
         job_income = self.get_prop("main.work.Job", "income")
         unemployed_months = self.get_prop("main.work.Job", "unemployed_months")
-        unemployed_since = self.get_prop("main.work.Job", "unemployed_since")
+        unemployed_months_this_year = self.get_prop("main.work.Job", "unemployed_months_this_year")
         if self.manager.profile.retired:
             return
 
         # tax_rate = self.get_prop("main.taxes.Taxes", "tax_rate")
-        salary_per_month = job_income / (12 - unemployed_months)
         months_you_get_unemployment_money = self.months_you_get_unemployment_money
         if self.manager.year - birth_year > 50:
             months_you_get_unemployment_money = 24
 
         self.expenses = job_income * self.fraction_of_income
-        if unemployed_months > 0:
 
-            month_you_get_money = unemployed_months
-            if unemployed_since > months_you_get_unemployment_money:
-                month_you_get_money -= (unemployed_since - months_you_get_unemployment_money)
+        if unemployed_months_this_year > 0:
+            month_you_get_money = unemployed_months_this_year
+            if unemployed_months > months_you_get_unemployment_money:
+                month_you_get_money -= (unemployed_months - months_you_get_unemployment_money)
             month_you_get_money = max(month_you_get_money, 0)
 
-            # TODO better formula to get unemployment money, howver Prio B...
+            # TODO better formula to get unemployment money
             self.income = month_you_get_money * salary_per_month * self.salary_fraction

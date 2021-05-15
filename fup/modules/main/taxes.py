@@ -1,55 +1,39 @@
-import random
 from fup.core.module import ChangeModule
 
 
 class Taxes(ChangeModule):
-    #    def __init__(self):
-    #        self.tax_rate = 0
-    #
-    #        # freisteuer
-    #        self.tax_free_limit = 10000  # in €
-    #        self.max_tax_increase_limit = 100000  # in €
-    #        self.min_tax_rate = 0.14
-    #        self.max_tax_rate = 0.42  # + random.gauss(mu=0, sigma=0.03)
-    #
-    #        self.real_tax_factor = 1
+    def calcualte_tax(self, taxable_income, total_inflation):
+        tax_free_limit = self.tax_free_limit * total_inflation
+        max_tax_increase_limit = self.max_tax_increase_limit * total_inflation
 
-    # TODO tax finetuning
-    #    # adjust tax based on current tax
-    #    if self.config.get("start_taxable_income"):
-    #        estimated_taxrate = self.calcualte_taxrate(taxable_income=self.config["start_taxable_income"])
-    #        if estimated_taxrate > 0:
-    #            self.real_tax_factor = 1.0 * self.config["start_tax"]
-    #            / self.config["start_taxable_income"] / estimated_taxrate
+        taxable_income -= tax_free_limit
+        if taxable_income <= 0:
+            return 0
 
-    def calcualte_taxrate(self, taxable_income):
-        # calculate tax rate estimation
-        if taxable_income < self.tax_free_limit:
-            self.tax_rate = 0
-        else:
-            tax_increase = (self.max_tax_rate - self.min_tax_rate) / (self.max_tax_increase_limit - self.tax_free_limit)
-            self.tax_rate = self.min_tax_rate + (taxable_income - self.tax_free_limit) * tax_increase
-        self.tax_rate = min(self.tax_rate, self.max_tax_rate)
+        # TODO this is not linear, but a step function
+        tax_increase = (self.max_tax_rate - self.min_tax_rate) / (max_tax_increase_limit - self.tax_free_limit)
+        tax_rate = self.min_tax_rate + taxable_income * tax_increase
+        tax_rate = min(tax_rate, self.max_tax_rate)
 
-        self.tax_rate *= self.real_tax_factor
-
-        return self.tax_rate
+        return tax_rate * taxable_income
 
     def next_year(self):
-        inflation = self.get_prop("main.environment.Inflation", "inflation")
+        total_inflation = self.get_prop("main.environment.Inflation", "total_inflation")
 
-        income = self.get_prop("main.work.Job", "income")
-        income += self.get_prop("main.insurances.InsurancePension", "income")
+        taxable_income = 0
+        for income in self.taxable_incomes:
+            taxable_income += self.get_prop(income, "income")
+        for expense in self.tax_offsets:
+            taxable_income -= self.get_prop(expense, "expenses")
+        taxable_income = max(0, taxable_income)
 
-        insurances = self.get_prop("main.insurances.InsuranceHealth", "expenses")
-        insurances += self.get_prop("main.insurances.InsuranceNursingCare", "expenses")
-        insurances += self.get_prop("main.insurances.InsurancePension", "expenses")
-        insurances += self.get_prop("main.insurances.InsuranceUnemployment", "expenses")
+        self.expenses = self.calcualte_tax(taxable_income=taxable_income, total_inflation=total_inflation)
 
-        taxable_income = income - insurances
+        # job, pension
+        # insurances = self.get_prop("main.insurances.InsuranceHealth", "expenses")
+        # insurances += self.get_prop("main.insurances.InsuranceNursingCare", "expenses")
+        # insurances += self.get_prop("main.insurances.InsurancePension", "expenses")
+        # insurances += self.get_prop("main.insurances.InsuranceUnemployment", "expenses")
 
-        self.tax_free_limit *= inflation
-        self.max_tax_increase_limit *= inflation
-
-        self.tax_rate = self.calcualte_taxrate(taxable_income=taxable_income)
-        self.expenses = taxable_income * self.tax_rate
+    def add_info(self, info_dict):
+        info_dict["tax"] = self.expenses

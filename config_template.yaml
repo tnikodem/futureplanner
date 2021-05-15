@@ -25,10 +25,10 @@ modules:
     mean_inflation: 2.2
   main.home.Flat:
     start_expenses: 6000
-  main.insurances.InsuranceHealth:
-  main.insurances.InsuranceNursingCare:
-  main.insurances.InsuranceUnemployment:
-  main.insurances.InsurancePension:
+  main.insurances.Health:
+  main.insurances.NursingCare:
+  main.insurances.Unemployment:
+  main.insurances.Pension:
     start_entgeltpunkte: 0
   main.mobility.Car:
     start_expenses: 2000
@@ -37,6 +37,12 @@ modules:
   main.other.OtherExpenses:
     start_expenses: 3000
   main.taxes.Taxes:
+    tax_free_limit": 10000
+    max_tax_increase_limit": 100000
+    min_tax_rate": 0.1
+    max_tax_rate": 0.4
+    taxable_incomes": [ "main.work.Job", "main.insurances.Pension" ]
+    tax_offsets": [ "Health" ]
   main.work.Job:
     start_income: 42000
   assets.money.Money:

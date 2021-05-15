@@ -1,22 +1,22 @@
-class TestProfile:
-    def __init__(self, manager, config):
+class Test:
+    def __init__(self, manager):
         self.manager = manager
-        self.config = config
+        self.config = manager.config
 
         self.married = False
         self.partner = False
         self.children = 0
-        self.retired = config["simulation"]["start_year"] >= config["profile"]["retirement_year"]
-        self.money_level = 0
-
-    def add_info(self, info_dict):
-        pass
+        self.retired = self.config["simulation"]["start_year"] >= self.config["profile"]["retirement_year"]
+        self.money_level = 10
 
     def update(self):
         self.retired = self.manager.year >= self.config["profile"]["retirement_year"]
 
+    def add_info(self, info_dict):
+        pass
 
-class DefaultProfile:
+
+class Default:
     def __init__(self, manager, config):
         self.manager = manager
         self.config = config

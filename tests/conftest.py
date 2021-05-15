@@ -1,6 +1,7 @@
 import pytest
 from fup.core.config import ModuleConfig
 from fup.core.manager import Manager
+from fup.profiles import profiles
 from fup.core.module import AssetModule
 
 
@@ -28,16 +29,4 @@ def default_manager(default_config):
         ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 0}, module_class=AssetModule),
     ]
 
-    class TestProfile:
-        def __init__(self, manager):
-            self.manager = manager
-            self.money_level = 10
-            self.retired = False
-
-        def update(self):
-            pass
-
-        def add_info(self, info_dict):
-            pass
-
-    return Manager(config=default_config, module_list=module_list, profile_class=TestProfile)
+    return Manager(config=default_config, module_list=module_list, profile_class=profiles.Test)
