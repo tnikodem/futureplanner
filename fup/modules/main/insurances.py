@@ -3,59 +3,49 @@ from fup.core.module import ChangeModule
 
 class Health(ChangeModule):
     def next_year(self):
+        inflation = self.get_prop("main.environment.Inflation", "inflation")
+        self.income_threshold *= inflation
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.Pension", "income")
-        self.expenses = income * self.fraction_of_income
+        capped_income = min(income, self.income_threshold)
+        self.expenses = capped_income * self.fraction_of_income
 
 
 class NursingCare(ChangeModule):
     def next_year(self):
+        inflation = self.get_prop("main.environment.Inflation", "inflation")
+        self.income_threshold *= inflation
         income = self.get_prop("main.work.Job", "income") + self.get_prop("main.insurances.Pension", "income")
+        capped_income = min(income, self.income_threshold)
         if self.manager.profile.retired:
-            self.expenses = income * self.fraction_of_income * self.retirement_factor
+            self.expenses = capped_income * self.fraction_of_income * self.retirement_factor
         else:
-            self.expenses = income * self.fraction_of_income
+            self.expenses = capped_income * self.fraction_of_income
 
 
 class Pension(ChangeModule):
     @property
     def expected_income(self):
+        # without inflation => inflation normalized income
         # expect to have similar income until retirement
         job_income = self.get_prop("main.work.Job", "income")
-        new_entgeldpunkte = min(job_income / self.durchschnittseinkommen, 2.1)
+        capped_income = min(job_income, self.income_threshold)
+        new_entgeldpunkte = capped_income / self.durchschnittseinkommen
         years_till_retirement = max((self.config["profile"]["retirement_year"] - self.manager.year), 0)
         expected_entgeldpunkte = self.entgeltpunkte + years_till_retirement * new_entgeldpunkte
-        return expected_entgeldpunkte * self.rentenwert
+        return expected_entgeldpunkte * self.rentenwert * 12
 
     def next_year(self):
         inflation = self.get_prop("main.environment.Inflation", "inflation")
         job_income = self.get_prop("main.work.Job", "income")
-
         self.rentenwert *= inflation
         self.durchschnittseinkommen *= inflation
+        self.income_threshold *= inflation
         if not self.manager.profile.retired:
-            self.new_entgeldpunkte = min(job_income / self.durchschnittseinkommen, 2.1)
-            self.entgeltpunkte += self.new_entgeldpunkte
-            self.income = 0
-            self.expenses = self.fraction_of_income * job_income
+            capped_income = min(job_income, self.income_threshold)
+            self.entgeltpunkte += capped_income / self.durchschnittseinkommen
+            self.expenses = self.fraction_of_income * capped_income
         else:
-            # Germany Pension Formula
-            # R = E * Z * R * A
-
-            # E: Entgeltpunkte
-            # Gehalt / deutsches Durchschnittseinkommen (38.901 in 2019)
-            # max 2.1 Punkte/Jahr
-
-            # Z: Zugangsfaktor
-            # Z = 1, jeden Monat früher in Rente = -0.003
-
-            # R: Rentenart-Faktor
-            # Altersrente: 1
-
-            # A: Rentenwert
-            # 33€ / Monat (2019)
-
-            self.income = self.entgeltpunkte * self.rentenwert
-            self.expenses = 0
+            self.income = self.entgeltpunkte * self.rentenwert * 12
 
 
 class Unemployment(ChangeModule):
@@ -65,21 +55,28 @@ class Unemployment(ChangeModule):
         job_income = self.get_prop("main.work.Job", "income")
         unemployed_months = self.get_prop("main.work.Job", "unemployed_months")
         unemployed_months_this_year = self.get_prop("main.work.Job", "unemployed_months_this_year")
+        inflation = self.get_prop("main.environment.Inflation", "inflation")
+
+        self.income_threshold *= inflation
+
+        capped_income = min(job_income, self.income_threshold)
+
+        # Paying money
         if self.manager.profile.retired:
-            return
+            self.expenses = capped_income * self.fraction_of_income * self.retirement_factor
+        else:
+            self.expenses = capped_income * self.fraction_of_income
 
-        # tax_rate = self.get_prop("main.taxes.Taxes", "tax_rate")
-        months_you_get_unemployment_money = self.months_you_get_unemployment_money
-        if self.manager.year - birth_year > 50:
-            months_you_get_unemployment_money = 24
-
-        self.expenses = job_income * self.fraction_of_income
-
+        # Getting money
         if unemployed_months_this_year > 0:
+            capped_salary_per_month = min(salary_per_month, self.income_threshold / 12)
+            months_you_get_unemployment_money = self.months_you_get_unemployment_money
+            if self.manager.year - birth_year > 54:
+                months_you_get_unemployment_money = 24
             month_you_get_money = unemployed_months_this_year
             if unemployed_months > months_you_get_unemployment_money:
                 month_you_get_money -= (unemployed_months - months_you_get_unemployment_money)
             month_you_get_money = max(month_you_get_money, 0)
 
             # TODO better formula to get unemployment money
-            self.income = month_you_get_money * salary_per_month * self.salary_fraction
+            self.income = month_you_get_money * capped_salary_per_month * self.salary_fraction

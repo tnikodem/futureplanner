@@ -15,7 +15,7 @@ def default_config():
         },
         "profile": {
             "birth_year": 2000,
-            "retirement_year": 2050,
+            "retirement_year": 2010,
             "retirement_factor": 1,
         }
     }

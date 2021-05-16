@@ -8,6 +8,7 @@ class Job(ChangeModule):
     # How much does it costs to find a new job?
     # - Movement ?
     # - Lower salary?
+    # - Compensation
 
     def __init__(self, start_income, prob_find_job, prob_lose_job, unemployed_months,
                  name="", manager=None, **kwargs):
@@ -26,7 +27,7 @@ class Job(ChangeModule):
         self.salary_per_month *= inflation
 
         if self.manager.profile.retired:
-            self.unemployed_months = 0
+            self.unemployed_months_this_year = 0
             return
 
         if self.config["simulation"]["random"]:

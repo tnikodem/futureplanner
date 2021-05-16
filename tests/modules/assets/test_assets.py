@@ -3,7 +3,6 @@ import random
 
 from fup.core.config import ModuleConfig
 from fup.core.manager import Manager
-
 from fup.modules.assets.money import Money
 from fup.modules.assets.investment import Standard
 

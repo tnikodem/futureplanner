@@ -22,19 +22,15 @@ class Change3(ChangeModule):
         self.income = 100
 
 
-class Asset(AssetModule):
-    pass
-
-
 def test_manager_dependency(default_config):
     module_list = [
         ModuleConfig(name="test3", module_config={}, module_class=Change3),
         ModuleConfig(name="test1", module_config={"value1": 1}, module_class=Change1),
         ModuleConfig(name="test2", module_config={"value2": 2}, module_class=Change2),
-        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=Asset),
+        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=AssetModule),
     ]
     manager = Manager(config=default_config, module_list=module_list)
-    # dependency check ()
+    # dependency check
     manager.dependency_check()
     assert manager.get_module("test2").depends_on_modules == {'test1'}
     assert manager.get_module("test3").modifies_modules == {'test1'}
@@ -48,20 +44,16 @@ def test_manager(default_config):
     module_list = [
         ModuleConfig(name="test3", module_config={}, module_class=Change3),
         ModuleConfig(name="test1", module_config={"value1": 1}, module_class=Change1),
-        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=Asset),
+        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=AssetModule),
     ]
     manager = Manager(config=default_config, module_list=module_list)
     assert manager is not None
     assert manager.total_assets == 1000
-
-    # get df row
     manager.next_year()
     df_row = manager.df_row
     assert df_row["year"] == 2001
     assert df_row["income"] == 100
     assert df_row["expenses"] == 3
-
-    # next year
     manager.next_year()
     df_row = manager.df_row
     assert df_row["year"] == 2002

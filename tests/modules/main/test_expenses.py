@@ -3,7 +3,7 @@ from fup.modules.main.environment import Inflation
 from fup.modules.main.expenses import InflationSensitive, InflationSensitiveVariable
 
 
-def test_inflation_sensitive(default_manager):
+def test_inflation_sensitive_expenses(default_manager):
     module_config = {"inflation_mean": 10, "inflation_std": 1}
     default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=module_config,
                                             module_class=Inflation))
@@ -17,7 +17,7 @@ def test_inflation_sensitive(default_manager):
     assert default_manager.df_row["expenses"] == 1100
 
 
-def test_inflation_sensitive_variable(default_manager):
+def test_inflation_sensitive_variable_expenses(default_manager):
     module_config = {"inflation_mean": 10, "inflation_std": 1}
     default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=module_config,
                                             module_class=Inflation))
