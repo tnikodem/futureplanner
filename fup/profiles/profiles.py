@@ -102,8 +102,8 @@ class Default:
         self.avg_working_expenses_wo_tax *= inflation
         if not self.retired:
             self.avg_working_expenses_wo_tax = (
-                                                           self.avg_working_expenses_wo_tax * self.years_count + expenses - tax - insurances) / (
-                                                           self.years_count + 1)
+                                                       self.avg_working_expenses_wo_tax * self.years_count + expenses - tax - insurances) / (
+                                                       self.years_count + 1)
 
         # set own values
         self.years_count += 1

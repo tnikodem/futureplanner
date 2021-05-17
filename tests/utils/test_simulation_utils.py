@@ -15,14 +15,14 @@ def test_get_sorted_modules(modules_config):
 
 
 def test_get_start_values(modules_config):
-    # 1000€ start money + 42840(1.02*42000€) income - 30% tax
     df = get_start_values(config=modules_config, profile_class=profiles.Test)
-    assert df.query("name == 'Job'")["income"].values[0] == pytest.approx(1.02 * 42000)
-
-    assert df["value"].sum() == pytest.approx(1000 + 1.02 * 42000 * 0.7)
-    assert df.query("name == 'assets.money.Money'")["value"].values[0] == pytest.approx(
-        0.6 * (1000 + 1.02 * 42000 * 0.7))
-    assert df.query("name == 'stocks'")["value"].values[0] == pytest.approx(0.4 * (1000 + 1.02 * 42000 * 0.7))
+    # Don't do tax calculation check here
+    job_income = df.query("name == 'Job'")["income"].values[0]
+    tax = df.query("name == 'main.taxes.Taxes'")["expenses"].values[0]
+    money = 1000 + job_income - tax
+    assert df["value"].sum() == pytest.approx(money)
+    assert df.query("name == 'assets.money.Money'")["value"].values[0] == pytest.approx(0.6 * money)
+    assert df.query("name == 'stocks'")["value"].values[0] == pytest.approx(0.4 *money)
 
 
 def test_run_simulations(modules_config):

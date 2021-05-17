@@ -52,10 +52,17 @@ def modules_config(default_config):
             "inflation_mean": 2.
         },
         "main.taxes.Taxes": {
-            "tax_free_limit": 00,
-            "max_tax_increase_limit": 100000,
-            "min_tax_rate": 0.3,
-            "max_tax_rate": 0.3,
+            "tax_rates": [
+                {"taxable_income": 0 + 9168, "tax_rate": 0.},
+                {"taxable_income": 3000 + 9168, "tax_rate": 0.04},
+                {"taxable_income": 8000 + 9168, "tax_rate": 0.1},
+                {"taxable_income": 15000 + 9168, "tax_rate": 0.147},
+                {"taxable_income": 26000 + 9168, "tax_rate": 0.20},
+                {"taxable_income": 42000 + 9168, "tax_rate": 0.25},
+                {"taxable_income": 64000 + 9168, "tax_rate": 0.303},
+                {"taxable_income": 116000 + 9168, "tax_rate": 0.355},
+                {"taxable_income": 325000 + 9168, "tax_rate": 0.405},
+                {"taxable_income": 827000 + 9168, "tax_rate": 0.43}],
             "taxable_incomes": ["Job"],
             "tax_offsets": []
         }
