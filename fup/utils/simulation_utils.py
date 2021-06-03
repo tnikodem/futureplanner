@@ -15,7 +15,7 @@ def get_sorted_module_config_list(config):
     module_list = get_module_config_list(config=config, root_module=fup.modules)
 
     # dry run to get dependencies
-    manager = Manager(config, module_list, profile_class=profiles.Test)
+    manager = Manager(config, module_list, profile_class=profiles.FullInvestment)
     manager.dependency_check()
     G = nx.DiGraph()
     G.add_node("root")

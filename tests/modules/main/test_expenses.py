@@ -19,6 +19,7 @@ def test_inflation_sensitive_expenses(default_manager):
 
 def test_inflation_sensitive_variable_expenses(default_manager):
     module_config = {"inflation_mean": 10, "inflation_std": 1}
+    default_manager.profile.money_level = 10
     default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=module_config,
                                             module_class=Inflation))
     default_manager.add_module(ModuleConfig(name="test", module_config={"start_expenses": 1000,

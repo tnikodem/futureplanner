@@ -76,4 +76,4 @@ def default_manager(default_config):
         ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 0}, module_class=AssetModule),
     ]
 
-    return Manager(config=default_config, module_list=module_list, profile_class=profiles.Test)
+    return Manager(config=default_config, module_list=module_list, profile_class=profiles.FullInvestment)

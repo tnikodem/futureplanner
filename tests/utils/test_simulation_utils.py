@@ -15,7 +15,7 @@ def test_get_sorted_modules(modules_config):
 
 
 def test_get_start_values(modules_config):
-    df = get_start_values(config=modules_config, profile_class=profiles.Test)
+    df = get_start_values(config=modules_config, profile_class=profiles.FullInvestment)
     # Don't do tax calculation check here
     job_income = df.query("name == 'Job'")["income"].values[0]
     tax = df.query("name == 'main.taxes.Taxes'")["expenses"].values[0]
@@ -26,7 +26,7 @@ def test_get_start_values(modules_config):
 
 
 def test_run_simulations(modules_config):
-    df, df_stats = run_simulations(config=modules_config, profile_class=profiles.Test, runs=2)
+    df, df_stats = run_simulations(config=modules_config, profile_class=profiles.FullInvestment, runs=2)
     assert "year" in df.columns
     assert "run" in df.columns
     assert list(df["run"].unique()) == [0, 1]
