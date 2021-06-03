@@ -2,20 +2,21 @@ import time
 import copy
 import pandas as pd
 import networkx as nx
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 from fup.core.manager import Manager
-from fup.core.functions import get_module_config_list
-from fup.profiles import profiles
+from fup.core.functions import get_module_blueprints, get_blueprint
+import fup.profiles
 import fup.modules
 
 
-def get_sorted_module_config_list(config):
-    # TODO put somewhere else, where??!
+# TODO put this method somewhere else, where??!
+def get_sorted_module_blueprints(config):
     # imports Manager -> no cyclic imports!
-    module_list = get_module_config_list(config=config, root_module=fup.modules)
+    module_list = get_module_blueprints(config=config, root_module=fup.modules)
+    profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
 
     # dry run to get dependencies
-    manager = Manager(config, module_list, profile_class=profiles.FullInvestment)
+    manager = Manager(config, module_list, profile_blueprint=profile_blueprint)
     manager.dependency_check()
     G = nx.DiGraph()
     G.add_node("root")
@@ -45,16 +46,21 @@ def get_sorted_module_config_list(config):
     for module_name in dep_checked_list:
         sorted_modules += [m for m in module_list if m.name == module_name]
 
-    sorted_modules += get_module_config_list(config=config, root_module=fup.modules, end_of_year=True)
+    sorted_modules += get_module_blueprints(config=config, root_module=fup.modules, end_of_year=True)
 
     return sorted_modules
 
 
-def get_start_values(config, profile_class, monitoring_class=None):
-    sorted_module_config_list = get_sorted_module_config_list(config=config)
-    manager = fup.core.manager.Manager(config=config, module_list=sorted_module_config_list,
-                                       profile_class=profile_class,
-                                       monitoring_class=monitoring_class)
+def get_start_values(config):
+    config = copy.deepcopy(config)
+    config["simulation"]["random"] = False
+    config["modules"]["main.environment.Inflation"]["inflation_mean"] = 0
+
+    sorted_module_blueprints = get_sorted_module_blueprints(config=config)
+    profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
+    manager = fup.core.manager.Manager(config=config,
+                                       module_blueprints=sorted_module_blueprints,
+                                       profile_blueprint=profile_blueprint)
     manager.next_year()
     rows = []
     for module_name in manager.modules:
@@ -62,16 +68,17 @@ def get_start_values(config, profile_class, monitoring_class=None):
     return pd.DataFrame(rows)
 
 
-def run_simulations(config, runs=100, profile_class=None, monitoring_class=None, debug=False):
+def run_simulations(config, runs=100, profile_class=None, debug=False):
     time_start = time.time()
 
-    sorted_module_config_list = get_sorted_module_config_list(config)
-
+    sorted_module_blueprints = get_sorted_module_blueprints(config)
+    profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
     dfs = []
     stats = []
     for i in range(runs):
-        manager = fup.core.manager.Manager(config=config, module_list=sorted_module_config_list,
-                                           profile_class=profile_class, monitoring_class=monitoring_class)
+        manager = fup.core.manager.Manager(config=config,
+                                           module_blueprints=sorted_module_blueprints,
+                                           profile_blueprint=profile_blueprint)
 
         rows = []
         for i_year in range(config["simulation"]["end_year"] - config["simulation"]["start_year"]):

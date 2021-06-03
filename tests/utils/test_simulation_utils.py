@@ -1,10 +1,10 @@
 import pytest
 from fup.profiles import profiles
-from fup.utils.simulation_utils import get_sorted_module_config_list, get_start_values, run_simulations
+from fup.utils.simulation_utils import get_sorted_module_blueprints, get_start_values, run_simulations
 
 
-def test_get_sorted_modules(modules_config):
-    sorted_module_config_list = get_sorted_module_config_list(modules_config)
+def test_get_sorted_module_blueprints(modules_config):
+    sorted_module_config_list = get_sorted_module_blueprints(modules_config)
     assert len(sorted_module_config_list) == 6
     assert sorted_module_config_list[0].name == "stocks"
     assert sorted_module_config_list[1].name == "assets.money.Money"
@@ -15,7 +15,7 @@ def test_get_sorted_modules(modules_config):
 
 
 def test_get_start_values(modules_config):
-    df = get_start_values(config=modules_config, profile_class=profiles.FullInvestment)
+    df = get_start_values(config=modules_config)
     # Don't do tax calculation check here
     job_income = df.query("name == 'Job'")["income"].values[0]
     tax = df.query("name == 'main.taxes.Taxes'")["expenses"].values[0]

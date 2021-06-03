@@ -1,18 +1,18 @@
 import pytest
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 from fup.core.manager import Manager
 from fup.core.module import Module, AssetModule, ChangeModule
 
 
 def test_module(default_config):
-    manager = Manager(config=default_config, module_list=[])
+    manager = Manager(config=default_config)
 
     # Setup
     # plain module
-    manager.add_module(ModuleConfig(name="test", module_config={}, module_class=Module))
+    manager.add_module(BluePrint(name="test", build_config={}, build_class=Module))
     assert type(manager.get_module("test")) == Module
     # Module with parameter
-    manager.add_module(ModuleConfig(name="test2", module_config={"test_parm": 123}, module_class=Module))
+    manager.add_module(BluePrint(name="test2", build_config={"test_parm": 123}, build_class=Module))
     assert manager.get_module("test2").test_parm == 123
 
     # getter
@@ -42,12 +42,12 @@ class Change2(ChangeModule):
 
 def test_change_module(default_manager):
     manager = default_manager
-    manager.add_module(ModuleConfig(name="test", module_config={}, module_class=Change1))
+    manager.add_module(BluePrint(name="test", build_config={}, build_class=Change1))
     cmod = manager.get_module("test")
     cmod.next_year_wrapper()
     assert manager.df_row["income"] == 1000
     assert manager.df_row["expenses"] == 500
-    manager.add_module(ModuleConfig(name="test2", module_config={}, module_class=Change2))
+    manager.add_module(BluePrint(name="test2", build_config={}, build_class=Change2))
     cmod2 = manager.get_module("test2")
     cmod2.next_year_wrapper()
     assert manager.df_row["income"] == 1000
@@ -66,12 +66,12 @@ def test_assets_module(default_config):
     gains_tax = 0.25
     exchange_fee = 0.1
 
-    manager = Manager(config=default_config, module_list=[])
+    manager = Manager(config=default_config)
 
-    manager.add_module(ModuleConfig(name="test", module_config={"start_money_value": 1000,
-                                                                "gains_tax": gains_tax,
-                                                                "exchange_fee": exchange_fee
-                                                                }, module_class=AssetModule))
+    manager.add_module(BluePrint(name="test", build_config={"start_money_value": 1000,
+                                                            "gains_tax": gains_tax,
+                                                            "exchange_fee": exchange_fee
+                                                            }, build_class=AssetModule))
     amod = manager.get_module("test")
     assert amod.money_value == 1000
 

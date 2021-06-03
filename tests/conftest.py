@@ -1,8 +1,9 @@
 import pytest
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 from fup.core.manager import Manager
-from fup.profiles import profiles
 from fup.core.module import AssetModule
+from fup.core.functions import get_blueprint
+import fup.profiles
 
 
 @pytest.fixture(scope="function")
@@ -14,9 +15,9 @@ def default_config():
             "random": False,
         },
         "profile": {
+            "class": "profiles.profiles.FullInvestment",
             "birth_year": 2000,
             "retirement_year": 2010,
-            "retirement_factor": 1,
         }
     }
 
@@ -49,7 +50,8 @@ def modules_config(default_config):
                    "value_increase_std": 0.1,
                    },
         "main.environment.Inflation": {
-            "inflation_mean": 2.
+            "inflation_mean": 2.,
+            "inflation_std": 2
         },
         "main.taxes.Taxes": {
             "tax_rates": [
@@ -72,8 +74,8 @@ def modules_config(default_config):
 
 @pytest.fixture(scope="function")
 def default_manager(default_config):
-    module_list = [
-        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 0}, module_class=AssetModule),
+    module_blueprints = [
+        BluePrint(name="assets.money.Money", build_config={"start_money_value": 0}, build_class=AssetModule),
     ]
-
-    return Manager(config=default_config, module_list=module_list, profile_class=profiles.FullInvestment)
+    profile_blueprint = get_blueprint(config=default_config["profile"], root_module=fup.profiles)
+    return Manager(config=default_config, module_blueprints=module_blueprints, profile_blueprint=profile_blueprint)

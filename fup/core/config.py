@@ -1,5 +1,5 @@
-class ModuleConfig:
-    def __init__(self, name, module_config, module_class):
+class BluePrint:
+    def __init__(self, build_config, build_class, name=""):
         self.name = name
-        self.module_config = module_config
-        self.module_class = module_class
+        self.build_config = build_config
+        self.build_class = build_class

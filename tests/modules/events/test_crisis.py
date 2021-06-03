@@ -2,7 +2,7 @@ import pytest
 import random
 import pandas as pd
 
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 from fup.core.module import AssetModule
 from fup.modules.main.environment import Inflation
 from fup.modules.main.work import Job
@@ -14,21 +14,21 @@ def test_oil_crisis_1973_fixed_year(default_manager):
     crisis_config = {
         "start_year": 2002
     }
-    manager.add_module(ModuleConfig(name="crisis", module_config=crisis_config, module_class=OilCrisis1973))
-    module_config = {"inflation_mean": 2, "inflation_std": 0}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=module_config,
-                                            module_class=Inflation))
-    job_module_config = {
+    manager.add_module(BluePrint(name="crisis", build_config=crisis_config, build_class=OilCrisis1973))
+    build_config = {"inflation_mean": 2, "inflation_std": 0}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
+                                         build_class=Inflation))
+    job_build_config = {
         "start_income": 30000,
         "unemployed_months": 0,
         "prob_lose_job": 0.05,  # per month
         "prob_find_job": 0.1,  # per month
     }
-    default_manager.add_module(ModuleConfig(name="main.work.Job", module_config=job_module_config, module_class=Job))
-    manager.add_module(ModuleConfig(name="assets.resources.Gold", module_config={"start_money_value": 500},
-                                    module_class=AssetModule))
-    manager.add_module(ModuleConfig(name="assets.stocks.Stocks", module_config={"start_money_value": 500},
-                                    module_class=AssetModule))
+    default_manager.add_module(BluePrint(name="main.work.Job", build_config=job_build_config, build_class=Job))
+    manager.add_module(BluePrint(name="assets.resources.Gold", build_config={"start_money_value": 500},
+                                 build_class=AssetModule))
+    manager.add_module(BluePrint(name="assets.stocks.Stocks", build_config={"start_money_value": 500},
+                                 build_class=AssetModule))
 
     # TODO refactor, this looks very similar to the run_simulation method
     rows = []
@@ -52,22 +52,22 @@ def test_oil_crisis_1973_random(default_manager):
     crisis_config = {
         "probability": 0.3
     }
-    manager.add_module(ModuleConfig(name="crisis", module_config=crisis_config, module_class=OilCrisis1973))
+    manager.add_module(BluePrint(name="crisis", build_config=crisis_config, build_class=OilCrisis1973))
 
-    module_config = {"inflation_mean": 2, "inflation_std": 0}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=module_config,
-                                            module_class=Inflation))
-    job_module_config = {
+    build_config = {"inflation_mean": 2, "inflation_std": 0}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
+                                         build_class=Inflation))
+    job_build_config = {
         "start_income": 30000,
         "unemployed_months": 0,
         "prob_lose_job": 0.05,  # per month
         "prob_find_job": 0.1,  # per month
     }
-    default_manager.add_module(ModuleConfig(name="main.work.Job", module_config=job_module_config, module_class=Job))
-    manager.add_module(ModuleConfig(name="assets.resources.Gold", module_config={"start_money_value": 500},
-                                    module_class=AssetModule))
-    manager.add_module(ModuleConfig(name="assets.stocks.Stocks", module_config={"start_money_value": 500},
-                                    module_class=AssetModule))
+    default_manager.add_module(BluePrint(name="main.work.Job", build_config=job_build_config, build_class=Job))
+    manager.add_module(BluePrint(name="assets.resources.Gold", build_config={"start_money_value": 500},
+                                 build_class=AssetModule))
+    manager.add_module(BluePrint(name="assets.stocks.Stocks", build_config={"start_money_value": 500},
+                                 build_class=AssetModule))
 
     rows = []
     for i in range(8):

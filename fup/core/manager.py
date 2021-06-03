@@ -3,29 +3,26 @@ import copy
 
 
 class Manager:
-    def __init__(self, config, module_list, monitoring_class=None, profile_class=None):
+    def __init__(self, config, module_blueprints=None, profile_blueprint=None):
         self.config = copy.deepcopy(config)
         self.year = config["simulation"]["start_year"]
+        self.modules = collections.OrderedDict()
+        self.profile = None  # Profile to provide information for modules about current situation of life
         self.df_row = dict(year=self.year)
 
-        # Modules
-        # TODO put sorting of dependencies here?!  - you only want to do sorting once...
-        self.modules = collections.OrderedDict()
-        for module in module_list:
-            self.add_module(module)
+        if module_blueprints is not None:
+            for module_blueprint in module_blueprints:  # TODO put sorting of dependencies here?!  - you only want to do sorting once...
+                self.add_module(module_blueprint)
+        if profile_blueprint is not None:
+            self.add_profile(profile_blueprint)
 
-        # Monitoring to get summary for toy. Monitoring does NOT provide information for modules
-        self.monitoring = None
-        if monitoring_class:
-            self.monitoring = monitoring_class(manager=self)
+    def add_module(self, module_blueprint):
+        self.modules[module_blueprint.name] = module_blueprint.build_class(name=module_blueprint.name,
+                                                                           manager=self,
+                                                                           **module_blueprint.build_config)
 
-        # Profile to provide information for modules about current situation of life
-        self.profile = None
-        if profile_class:
-            self.profile = profile_class(manager=self)
-
-    def add_module(self, module):
-        self.modules[module.name] = module.module_class(name=module.name, manager=self, **module.module_config)
+    def add_profile(self, profile_blueprint):
+        self.profile = profile_blueprint.build_class(manager=self, **profile_blueprint.build_config)
 
     def get_module(self, module_name):
         return self.modules[module_name]
@@ -37,8 +34,6 @@ class Manager:
             self.modules[module_name].next_year_wrapper()
         if self.profile:
             self.profile.update()
-        if self.monitoring:
-            self.monitoring.next_year()
 
     def dependency_check(self):
         for module_name in self.modules:

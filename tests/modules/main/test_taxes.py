@@ -1,6 +1,6 @@
 import pytest
 
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 
 from fup.core.module import Module
 from fup.modules.main.environment import Inflation
@@ -35,7 +35,7 @@ def calc_tax(income):
     return income * par5_a - par5_b
 
 
-inflation_module_config = {"inflation_mean": 0, "inflation_std": 1}
+inflation_build_config = {"inflation_mean": 0, "inflation_std": 1}
 
 pension_config = {
         "entgeltpunkte": 0,  # your points
@@ -55,7 +55,7 @@ unemployed_config = {"fraction_of_income": 0.024 * 0.5,
 
 
 # https://www.lohn-info.de/durchschnittssteuersatz_grenzsteuersatz.html
-tax_module_config = {
+tax_build_config = {
     # linear interpolation between points
     "tax_rates": [
                     {"taxable_income": 0+9168, "tax_rate": 0.},
@@ -77,28 +77,28 @@ tax_module_config = {
 def test_taxes(default_manager):
     for income in [0, 1e3, 1e4, 2e4, 3e4, 4e4, 5e4, 6e4, 1e5, 1e6]:
         # TODO this is a hack overwriting modules, is this good?!?!
-        default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=inflation_module_config,
-                                                module_class=Inflation))
-        default_manager.add_module(ModuleConfig(name="main.work.Job",
-                                                module_config={"income": income,
-                                                               "salary_per_month": income/12,
-                                                               "unemployed_months": 0,
-                                                               "unemployed_months_this_year": 0,
-                                                               }, module_class=Module))
-        default_manager.add_module(ModuleConfig(name="main.insurances.Pension", module_config=pension_config,
-                                                module_class=Pension))
-        default_manager.add_module(ModuleConfig(name="main.insurances.Health",
-                                                module_config={"fraction_of_income": 0.073,  # 2020
-                                                               "income_threshold": 56250,  # €/year , 2020
-                                                              }, module_class=Health))
-        default_manager.add_module(ModuleConfig(name="main.insurances.NursingCare",
-                                                module_config={"fraction_of_income": 0.0165,  # 2020
-                                                               "retirement_factor": 2,
-                                                               "income_threshold": 56250,  # €/year , 2020
-                                                              }, module_class=NursingCare))
-        default_manager.add_module(ModuleConfig(name="main.insurances.Unemployment", module_config=unemployed_config,
-                                                module_class=Unemployment))
-        default_manager.add_module(ModuleConfig(name="Tax", module_config=tax_module_config, module_class=Taxes))
+        default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
+                                             build_class=Inflation))
+        default_manager.add_module(BluePrint(name="main.work.Job",
+                                             build_config={"income": income,
+                                                           "salary_per_month": income/12,
+                                                           "unemployed_months": 0,
+                                                           "unemployed_months_this_year": 0,
+                                                           }, build_class=Module))
+        default_manager.add_module(BluePrint(name="main.insurances.Pension", build_config=pension_config,
+                                             build_class=Pension))
+        default_manager.add_module(BluePrint(name="main.insurances.Health",
+                                             build_config={"fraction_of_income": 0.073,  # 2020
+                                                           "income_threshold": 56250,  # €/year , 2020
+                                                          }, build_class=Health))
+        default_manager.add_module(BluePrint(name="main.insurances.NursingCare",
+                                             build_config={"fraction_of_income": 0.0165,  # 2020
+                                                           "retirement_factor": 2,
+                                                           "income_threshold": 56250,  # €/year , 2020
+                                                          }, build_class=NursingCare))
+        default_manager.add_module(BluePrint(name="main.insurances.Unemployment", build_config=unemployed_config,
+                                             build_class=Unemployment))
+        default_manager.add_module(BluePrint(name="Tax", build_config=tax_build_config, build_class=Taxes))
         default_manager.next_year()
 
         if income < 56250:

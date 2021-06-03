@@ -1,7 +1,7 @@
 import random
 import pytest
 
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 from fup.core.module import Module
 from fup.modules.main.environment import Inflation
 from fup.modules.main.work import Job
@@ -14,19 +14,19 @@ def test_pension(default_manager):
       https://www.handelsblatt.com/politik/deutschland/rentenpunkte-erklaert-so-errechnen-sie-2021-mit-rentenpunkten-die-hoehe-ihrer-gesetzlichen-rente/26969926.html?ticket=ST-4923658-1gjQbaUz5TlgEFV2rId6-ap6
       https://www.finanztip.de/beitragsbemessungsgrenze/
     """
-    module_config = {"inflation_mean": 0, "inflation_std": 1}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=module_config,
-                                            module_class=Inflation))
-    default_manager.add_module(ModuleConfig(name="main.work.Job", module_config={"income": 0},
-                                            module_class=Module))
-    module_config = {
+    build_config = {"inflation_mean": 0, "inflation_std": 1}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
+                                         build_class=Inflation))
+    default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 0},
+                                         build_class=Module))
+    build_config = {
         "entgeltpunkte": 0,  # your points
         "rentenwert": 34.19,  # €/Entgeltpunkt/month, 2020
         "durchschnittseinkommen": 40551,  # € per year, 2020
         "fraction_of_income": 0.186 * 0.5,  # 2020  (half employer, half employee)
         "income_threshold": 82800,  # € per year, 2020
     }
-    default_manager.add_module(ModuleConfig(name="pension", module_config=module_config, module_class=Pension))
+    default_manager.add_module(BluePrint(name="pension", build_config=build_config, build_class=Pension))
     # Paying money
     # None
     default_manager.next_year()
@@ -53,19 +53,19 @@ def test_pension(default_manager):
 
 
 def test_pension_expected_income(default_manager):
-    module_config = {"inflation_mean": 0, "inflation_std": 1}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=module_config,
-                                            module_class=Inflation))
-    default_manager.add_module(ModuleConfig(name="main.work.Job", module_config={"income": 40551},
-                                            module_class=Module))
-    module_config = {
+    build_config = {"inflation_mean": 0, "inflation_std": 1}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
+                                         build_class=Inflation))
+    default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 40551},
+                                         build_class=Module))
+    build_config = {
         "entgeltpunkte": 0,  # your points
         "rentenwert": 34.19,  # €/Entgeltpunkt/month, 2020
         "durchschnittseinkommen": 40551,  # € per year, 2020
         "fraction_of_income": 0.186 * 0.5,  # 2020  (half employer, half employee)
         "income_threshold": 82800,  # € per year, 2020
     }
-    default_manager.add_module(ModuleConfig(name="pension", module_config=module_config, module_class=Pension))
+    default_manager.add_module(BluePrint(name="pension", build_config=build_config, build_class=Pension))
     assert default_manager.get_module("pension").expected_income == pytest.approx(10 * 34.19 * 12)
 
 
@@ -76,17 +76,17 @@ def test_insurance_health(default_manager):
       ~14.6% (half employer, half employee)
     """
 
-    inflation_module_config = {"inflation_mean": 0, "inflation_std": 0}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=inflation_module_config,
-                                            module_class=Inflation))
-    default_manager.add_module(ModuleConfig(name="main.work.Job", module_config={"income": 10000},
-                                            module_class=Module))
-    default_manager.add_module(ModuleConfig(name="main.insurances.Pension", module_config={"income": 0},
-                                            module_class=Module))
+    inflation_build_config = {"inflation_mean": 0, "inflation_std": 0}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
+                                         build_class=Inflation))
+    default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 10000},
+                                         build_class=Module))
+    default_manager.add_module(BluePrint(name="main.insurances.Pension", build_config={"income": 0},
+                                         build_class=Module))
 
-    default_manager.add_module(ModuleConfig(name="health", module_config={"fraction_of_income": 0.073,  # 2020
-                                                                          "income_threshold": 56250,  # €/year , 2020
-                                                                          }, module_class=Health))
+    default_manager.add_module(BluePrint(name="health", build_config={"fraction_of_income": 0.073,  # 2020
+                                                                      "income_threshold": 56250,  # €/year , 2020
+                                                                      }, build_class=Health))
     default_manager.next_year()
     assert default_manager.df_row["expenses"] == pytest.approx(10000 * 0.073)
     # Above max
@@ -101,17 +101,17 @@ def test_insurance_nursing_care(default_manager):
       https://www.finanztip.de/beitragsbemessungsgrenze/
       ~3.3% (half employer, half employee), full when retired
     """
-    inflation_module_config = {"inflation_mean": 0, "inflation_std": 0}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=inflation_module_config,
-                                            module_class=Inflation))
-    default_manager.add_module(ModuleConfig(name="main.work.Job", module_config={"income": 10000}, module_class=Module))
-    default_manager.add_module(ModuleConfig(name="main.insurances.Pension", module_config={"income": 0},
-                                            module_class=Module))
+    inflation_build_config = {"inflation_mean": 0, "inflation_std": 0}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
+                                         build_class=Inflation))
+    default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 10000}, build_class=Module))
+    default_manager.add_module(BluePrint(name="main.insurances.Pension", build_config={"income": 0},
+                                         build_class=Module))
 
-    default_manager.add_module(ModuleConfig(name="care", module_config={"fraction_of_income": 0.0165,  # 2020
-                                                                        "retirement_factor": 2,
-                                                                        "income_threshold": 56250,  # €/year , 2020
-                                                                        }, module_class=NursingCare))
+    default_manager.add_module(BluePrint(name="care", build_config={"fraction_of_income": 0.0165,  # 2020
+                                                                    "retirement_factor": 2,
+                                                                    "income_threshold": 56250,  # €/year , 2020
+                                                                    }, build_class=NursingCare))
     # Standard
     default_manager.next_year()
     assert default_manager.df_row["expenses"] == pytest.approx(10000 * 0.0165)
@@ -146,16 +146,16 @@ def test_unemployment(default_manager):
 
 
     """
-    inflation_module_config = {"inflation_mean": 0, "inflation_std": 0}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=inflation_module_config,
-                                            module_class=Inflation))
-    job_module_config = {
+    inflation_build_config = {"inflation_mean": 0, "inflation_std": 0}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
+                                         build_class=Inflation))
+    job_build_config = {
         "start_income": 10000,
         "unemployed_months": 0,
         "prob_lose_job": 0.,
         "prob_find_job": 0.,
     }
-    default_manager.add_module(ModuleConfig(name="main.work.Job", module_config=job_module_config, module_class=Job))
+    default_manager.add_module(BluePrint(name="main.work.Job", build_config=job_build_config, build_class=Job))
 
     unemployed_config = {"fraction_of_income": 0.024 * 0.5,
                          "retirement_factor": 0,
@@ -165,8 +165,8 @@ def test_unemployment(default_manager):
                          "salary_fraction": 0.8*0.6,  #  ~50%
                          }
 
-    default_manager.add_module(ModuleConfig(name="unemployment", module_config=unemployed_config,
-                                            module_class=Unemployment))
+    default_manager.add_module(BluePrint(name="unemployment", build_config=unemployed_config,
+                                         build_class=Unemployment))
 
     # Paying money
     # Standard

@@ -1,4 +1,4 @@
-from fup.core.functions import get_full_class_name, get_all_modules, get_module_config_list
+from fup.core.functions import get_full_class_name, get_all_modules, get_module_blueprints
 
 
 def test_get_full_class_name():
@@ -35,17 +35,17 @@ def test_get_module_config_list():
             }
         }
     }
-    module_config_list = get_module_config_list(root_module=fup.modules, config=config)
+    module_config_list = get_module_blueprints(root_module=fup.modules, config=config)
     assert len(module_config_list) == 2
     assert module_config_list[0].name == "main.environment.Inflation"
-    assert module_config_list[0].module_class == fup.modules.main.environment.Inflation
-    assert module_config_list[0].module_config["inflation_mean"] == 2.2
+    assert module_config_list[0].build_class == fup.modules.main.environment.Inflation
+    assert module_config_list[0].build_config["inflation_mean"] == 2.2
     assert module_config_list[1].name == "Job"
-    assert module_config_list[1].module_config == {"start_income": 42000}
-    assert module_config_list[1].module_class == fup.modules.main.work.Job
+    assert module_config_list[1].build_config == {"start_income": 42000}
+    assert module_config_list[1].build_class == fup.modules.main.work.Job
 
-    module_config_list = get_module_config_list(root_module=fup.modules, config=config, end_of_year=True)
+    module_config_list = get_module_blueprints(root_module=fup.modules, config=config, end_of_year=True)
     assert len(module_config_list) == 1
     assert module_config_list[0].name == "main.investing.Investing"
-    assert module_config_list[0].module_class == fup.modules.main.investing.Investing
-    assert module_config_list[0].module_config == {"assets_ratios": {"test": 0.4}}
+    assert module_config_list[0].build_class == fup.modules.main.investing.Investing
+    assert module_config_list[0].build_config == {"assets_ratios": {"test": 0.4}}

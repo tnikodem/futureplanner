@@ -1,7 +1,7 @@
 import copy
 import inspect
 
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 
 
 def get_full_class_name(module):
@@ -33,31 +33,39 @@ def get_all_modules(root_module, classes=None, module_name=None):
     return classes
 
 
-def get_module_config_list(root_module, config, end_of_year=False):
+def get_blueprint(config, root_module):
+    config = copy.deepcopy(config)
+    assert "class" in config
+    all_module_classes = get_all_modules(root_module=root_module)
+    assert config["class"] in all_module_classes
+    build_class = all_module_classes[config["class"]]
+    del config["class"]
+
+    return BluePrint(build_class=build_class, build_config=config)
+
+
+def get_module_blueprints(root_module, config, end_of_year=False):
     config = copy.deepcopy(config)  # FIXME, class and run_end_of_year is "cleaned"
     standard_modules = get_all_modules(root_module=root_module)
 
-    module_list = []
+    blueprint_list = []
     for name in config["modules"].keys():
-        module_config = config["modules"][name]
-        if module_config is None:
-            module_config = {}
+        build_config = config["modules"][name]
+        if build_config is None:
+            build_config = {}
 
         if end_of_year:
-            if "run_end_of_year" not in module_config or not module_config["run_end_of_year"]:
+            if "run_end_of_year" not in build_config or not build_config["run_end_of_year"]:
                 continue
-            del module_config["run_end_of_year"]
+            del build_config["run_end_of_year"]
         else:
-            if "run_end_of_year" in module_config and module_config["run_end_of_year"]:
+            if "run_end_of_year" in build_config and build_config["run_end_of_year"]:
                 continue
 
-        if "class" in module_config:
-            module_class = standard_modules[module_config["class"]]
-            del module_config["class"]
+        if "class" in build_config:
+            build_class = standard_modules[build_config["class"]]
+            del build_config["class"]
         else:
-            module_class = standard_modules[name]
-        module_list += [ModuleConfig(name=name,
-                                     module_config=module_config,
-                                     module_class=module_class
-                                     )]
-    return module_list
+            build_class = standard_modules[name]
+        blueprint_list += [BluePrint(name=name, build_config=build_config, build_class=build_class)]
+    return blueprint_list

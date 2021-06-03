@@ -3,7 +3,7 @@ from fup.core.module import Module
 
 
 class Inflation(Module):
-    def __init__(self, name="", manager=None, inflation_mean=2, inflation_std=1, **kwargs):
+    def __init__(self, inflation_mean, inflation_std, name="", manager=None, **kwargs):
         super().__init__(name=name, manager=manager, **kwargs)
         self.inflation_mean = inflation_mean
         self.inflation_std = inflation_std

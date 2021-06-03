@@ -1,16 +1,18 @@
 class FullInvestment:
-    def __init__(self, manager):
+    def __init__(self, manager, birth_year, retirement_year, married=False, partner=False, children=0):
         self.manager = manager
 
-        self.married = False
-        self.partner = False
-        self.children = 0
-        self.retired = manager.config["simulation"]["start_year"] >= manager.config["profile"]["retirement_year"]
+        self.birth_year = birth_year
+        self.retirement_year = retirement_year
+        self.married = married
+        self.partner = partner
+        self.children = children
+
+        self.retired = manager.config["simulation"]["start_year"] >= self.retirement_year
         self.money_level = 0  # always full money put into investment, thus always 0
 
     def update(self):
         self.retired = self.manager.year >= self.manager.config["profile"]["retirement_year"]
-
 
 # class EqualExpenses:
 #     def __init__(self, manager, config):

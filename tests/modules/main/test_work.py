@@ -1,22 +1,22 @@
 import random
 import pytest
 
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 from fup.modules.main.environment import Inflation
 from fup.modules.main.work import Job
 
 
 def test_taxes(default_manager):
-    inflation_module_config = {"inflation_mean": 2, "inflation_std": 0}
-    default_manager.add_module(ModuleConfig(name="main.environment.Inflation", module_config=inflation_module_config,
-                                            module_class=Inflation))
-    job_module_config = {
+    inflation_build_config = {"inflation_mean": 2, "inflation_std": 0}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
+                                            build_class=Inflation))
+    job_build_config = {
         "start_income": 30000,
         "unemployed_months": 0,
         "prob_lose_job": 1.0,  # per month
         "prob_find_job": 0.0,  # per month
     }
-    default_manager.add_module(ModuleConfig(name="Job", module_config=job_module_config, module_class=Job))
+    default_manager.add_module(BluePrint(name="Job", build_config=job_build_config, build_class=Job))
     default_manager.next_year()
     assert default_manager.df_row["income"] == pytest.approx(30000 * 1.02)
 

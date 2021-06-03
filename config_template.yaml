@@ -1,53 +1,40 @@
 # Every number is with regard of a whole year
 
-# Simulation config
 simulation:
   random: True
   start_year: 2021
   end_year: 2100
 
-  # TODO Values below not really needed
-  start_income: 42000  # total of expenses you had last year (not really needed?!)
-  start_expenses: 19000  # total of expenses you had last year (not really needed?!)
-  # for tax fine tuning
-  start_taxable_income: 32000
-  start_tax: 6700
-
 profile:
+  class: profiles.profiles.FullInvestment
   birth_year: 2000
   retirement_year: 2060
-  # Retirement
-  retirement_factor: 1  # How much should your expenses decrease in retirement ?
-  desired_money_buffer: 10000  # How much money do you want to have after end_year ?
 
 modules:
   main.environment.Inflation:
-    mean_inflation: 2.2
-  main.home.Flat:
-    start_expenses: 6000
-  main.insurances.Health:
-  main.insurances.NursingCare:
-  main.insurances.Unemployment:
-  main.insurances.Pension:
-    start_entgeltpunkte: 0
-  main.mobility.Car:
-    start_expenses: 2000
-  main.other.LuxuryExpenses:
-    start_expenses: 7000
-  main.other.OtherExpenses:
-    start_expenses: 3000
-  main.taxes.Taxes:
-    tax_free_limit": 10000
-    max_tax_increase_limit": 100000
-    min_tax_rate": 0.1
-    max_tax_rate": 0.4
-    taxable_incomes": [ "main.work.Job", "main.insurances.Pension" ]
-    tax_offsets": [ "Health" ]
+    inflation_mean: 2.2
+    inflation_std: 2
   main.work.Job:
     start_income: 42000
+    unemployed_months: 0
+    prob_lose_job: 0.01  # per month
+    prob_find_job: 0.1  # per month
+  main.home.Flat:
+    class: main.expenses.InflationSensitive
+    start_expenses: 6000
+  main.mobility.Car:
+    class: main.expenses.InflationSensitive
+    start_expenses: 2000
+  main.other.OtherExpenses:
+    class: main.expenses.InflationSensitive
+    start_expenses: 3000
+  main.other.LuxuryExpenses:
+    class: main.expenses.InflationSensitiveVariable
+    start_expenses: 2000
+
   assets.money.Money:
     start_money_value: 1000
-  stocks:
+  assets.stocks.Stocks:
     class: assets.investment.Standard
     start_money_value: 0
     gains_tax: 0.25
@@ -57,26 +44,75 @@ modules:
     # Gross Total Return-Index includes dividends
     value_increase_mean: 0.092
     value_increase_std: 0.14
-  gold:
+  assets.resources.Gold:
     class: assets.investment.Standard
     start_money_value: 0
-    # no settlement tax, if gold is hold longer than 1 year
-    # differntial tax on silver ~ 10% if bought, no tax if sold
+    # no tax, if gold is hold longer than 1 year
+    # differential tax on silver ~ 10% if bought, no tax if sold
     gains_tax: 0.
     exchange_fee: 0.05
     depot_costs: 0.01
     # Gold price since since 1950
     value_increase_mean: 0.076029
     value_increase_std: 0.231742
-  main.investment.Investment:
+  main.investing.Investing:
     run_end_of_year: True
-    assets_stock_ratio: 0.3
-    assets_gold_ratio: 0.1
+    assets_ratios:
+      assets.stocks.Stocks: 0.4
+      assets.resources.Gold: 0.1
+
+  main.insurances.Health:
+    fraction_of_income: 0.073  # 2020
+    income_threshold: 56250  # €/year , 2020
+  main.insurances.NursingCare:
+    fraction_of_income: 0.0165  # 2020
+    retirement_factor: 2
+    income_threshold: 56250  # €/year , 2020
+  main.insurances.Unemployment:
+    fraction_of_income: 0.012  # half employer, half employee
+    retirement_factor: 0
+    income_threshold: 82800
+    months_you_get_unemployment_money: 12
+    salary_fraction: 0.5
+  main.insurances.Pension:
+    entgeltpunkte: 0  # your points
+    rentenwert: 34.19  # €/Entgeltpunkt/month, 2020
+    durchschnittseinkommen: 40551  # € per year, 2020
+    fraction_of_income: 0.093  # 2020  (half employer, half employee)
+    income_threshold: 82800  # € per year, 2020
+  main.taxes.Taxes:
+    tax_rates:
+      - taxable_income: 9168
+        tax_rate: 0.
+      - taxable_income: 12168
+        tax_rate: 0.04
+      - taxable_income: 17168
+        tax_rate: 0.1
+      - taxable_income: 24168
+        tax_rate: 0.147
+      - taxable_income: 35168
+        tax_rate: 0.2
+      - taxable_income: 51168
+        tax_rate: 0.25
+      - taxable_income: 73168
+        tax_rate: 0.303
+      - taxable_income: 125168
+        tax_rate: 0.355
+      - taxable_income: 334168
+        tax_rate: 0.405
+      - taxable_income: 836168
+        tax_rate: 0.43
+    taxable_incomes:
+      - main.work.Job
+      - main.insurances.Pension
+    tax_offsets:
+      - main.insurances.Health
+      - main.insurances.NursingCare
+      - main.insurances.Pension
+      - main.insurances.Unemployment
 
   events.crisis.OilCrisis1973:
     probability: 0.07
-
   crisis_2045:
     class: events.crisis.OilCrisis1973
     start_year: 2045
-

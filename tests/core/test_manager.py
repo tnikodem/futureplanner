@@ -1,4 +1,4 @@
-from fup.core.config import ModuleConfig
+from fup.core.config import BluePrint
 from fup.core.manager import Manager
 from fup.core.module import ChangeModule, AssetModule
 
@@ -23,13 +23,13 @@ class Change3(ChangeModule):
 
 
 def test_manager_dependency(default_config):
-    module_list = [
-        ModuleConfig(name="test3", module_config={}, module_class=Change3),
-        ModuleConfig(name="test1", module_config={"value1": 1}, module_class=Change1),
-        ModuleConfig(name="test2", module_config={"value2": 2}, module_class=Change2),
-        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=AssetModule),
+    module_blueprints = [
+        BluePrint(name="test3", build_config={}, build_class=Change3),
+        BluePrint(name="test1", build_config={"value1": 1}, build_class=Change1),
+        BluePrint(name="test2", build_config={"value2": 2}, build_class=Change2),
+        BluePrint(name="assets.money.Money", build_config={"start_money_value": 1000}, build_class=AssetModule),
     ]
-    manager = Manager(config=default_config, module_list=module_list)
+    manager = Manager(config=default_config, module_blueprints=module_blueprints)
     # dependency check
     manager.dependency_check()
     assert manager.get_module("test2").depends_on_modules == {'test1'}
@@ -38,15 +38,15 @@ def test_manager_dependency(default_config):
 
 def test_manager(default_config):
     # empty manager
-    manager = Manager(config=default_config, module_list=[])
+    manager = Manager(config=default_config)
     assert manager is not None
     # manager with modules
-    module_list = [
-        ModuleConfig(name="test3", module_config={}, module_class=Change3),
-        ModuleConfig(name="test1", module_config={"value1": 1}, module_class=Change1),
-        ModuleConfig(name="assets.money.Money", module_config={"start_money_value": 1000}, module_class=AssetModule),
+    module_blueprints = [
+        BluePrint(name="test3", build_config={}, build_class=Change3),
+        BluePrint(name="test1", build_config={"value1": 1}, build_class=Change1),
+        BluePrint(name="assets.money.Money", build_config={"start_money_value": 1000}, build_class=AssetModule),
     ]
-    manager = Manager(config=default_config, module_list=module_list)
+    manager = Manager(config=default_config, module_blueprints=module_blueprints)
     assert manager is not None
     assert manager.total_assets == 1000
     manager.next_year()
