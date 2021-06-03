@@ -1,16 +1,16 @@
 import pytest
 
 from fup.core.config import BluePrint
+from fup.core.module import AssetModule
 
-from fup.modules.assets.money import Money
 from fup.modules.main.investing import Investing
 
 
 def test_investing(default_manager):
-    default_manager.add_module(BluePrint(name="test", build_config={"start_money_value": 1000,
-                                                                        }, build_class=Money))
-    default_manager.add_module(BluePrint(name="test2", build_config={"start_money_value": 100,
-                                                                         }, build_class=Money))
+    default_manager.add_module(BluePrint(name="test", build_config={"start_money_value": 1000},
+                                         build_class=AssetModule))
+    default_manager.add_module(BluePrint(name="test2", build_config={"start_money_value": 100},
+                                         build_class=AssetModule))
     build_config = {
         "assets_ratios": {
             "test": 0.4,

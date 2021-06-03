@@ -34,6 +34,9 @@ class CurrentAccount(Module):
         return f"""{get_full_class_name(self.__class__)}: {int(self.money_value)}€"""
 
     def next_year(self):
-        # TODO add calculations
+        if self.money_value > self.penalty_interest_limit:
+            self.money_value -= (self.money_value - self.penalty_interest_limit) * self.penalty_interest_rate
+        if self.money_value < 0:
+            self.money_value += self.money_value * self.overdraft_rate
 
         self.df_row["money"] = self.money_value

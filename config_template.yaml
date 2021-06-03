@@ -32,8 +32,6 @@ modules:
     class: main.expenses.InflationSensitiveVariable
     start_expenses: 2000
 
-  assets.money.Money:
-    start_money_value: 1000
   assets.stocks.Stocks:
     class: assets.investment.Standard
     start_money_value: 0
@@ -116,3 +114,11 @@ modules:
   crisis_2045:
     class: events.crisis.OilCrisis1973
     start_year: 2045
+
+  CurrentAccount:
+    class: assets.bank.CurrentAccount
+    run_end_of_year: True
+    start_money_value: 1000
+    penalty_interest_limit: 50000
+    penalty_interest_rate: 0.05
+    overdraft_rate": 0.0775

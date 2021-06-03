@@ -13,7 +13,7 @@ def test_get_all_modules():
     import fup.modules
     module_list = get_all_modules(root_module=fup.modules)
     assert "main.work.Job" in module_list.keys()
-    assert "assets.money.Money" in module_list.keys()
+    assert "assets.bank.CurrentAccount" in module_list.keys()
 
 
 def test_get_module_config_list():
