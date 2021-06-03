@@ -109,9 +109,7 @@ def test_assets_module(default_config, default_profile_blueprint):
     value_with_fee_1 = 12 * (1 - exchange_fee)
     # other half with gain 2
     value_with_fee_2 = 2 * (1 - exchange_fee)
-    assert amod.change(money=-14400) == pytest.approx((14400. - (
-            7200. * (value_with_fee_1 - 1) / value_with_fee_1 + 7200. * (
-            value_with_fee_2 - 1) / value_with_fee_2) * gains_tax) * (1. - exchange_fee))
+    assert amod.change(money=-14400) == pytest.approx((14400. - (7200. * (value_with_fee_1 - 1) / value_with_fee_1 + 7200. * (value_with_fee_2 - 1) / value_with_fee_2) * gains_tax) * (1. - exchange_fee))
     assert amod.money_value == 14400
 
     # info dict

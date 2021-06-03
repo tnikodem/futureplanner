@@ -23,7 +23,7 @@ def test_standard(default_manager):
                                                                      }, build_class=Standard))
     default_manager.next_year()
     assert default_manager.df_row["test"] == pytest.approx(1000 * 1.1 * (1 - 0.01))
-    assert default_manager.total_assets == pytest.approx((1000*1.1) * (1 - 0.01))
+    assert default_manager.total_assets == pytest.approx((1000 * 1.1) * (1 - 0.01))
     # random
     random.seed(42)
     default_manager.config["simulation"]["random"] = True

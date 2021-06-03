@@ -21,7 +21,7 @@ def test_get_start_values(modules_config):
     money = 1000 + job_income - tax
     assert df["value"].sum() == pytest.approx(money)
     assert df.query("name == 'CurrentAccount'")["value"].values[0] == pytest.approx(0.6 * money)
-    assert df.query("name == 'stocks'")["value"].values[0] == pytest.approx(0.4 *money)
+    assert df.query("name == 'stocks'")["value"].values[0] == pytest.approx(0.4 * money)
 
 
 def test_run_simulations(modules_config):

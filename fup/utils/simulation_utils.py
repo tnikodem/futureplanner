@@ -2,35 +2,24 @@ import time
 import copy
 import pandas as pd
 import networkx as nx
-from fup.core.config import BluePrint
 from fup.core.manager import Manager
 from fup.core.functions import get_module_blueprints, get_blueprint
 import fup.profiles
 import fup.modules
 
 
-# TODO put this method somewhere else, where??!
-def get_sorted_module_blueprints(config):
-    # imports Manager -> no cyclic imports!
-    module_blueprints = get_module_blueprints(config=config, root_module=fup.modules)
-    profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
-
-    # dry run to get dependencies
-    manager = Manager(config,
-                      module_blueprints=module_blueprints,
-                      profile_blueprint=profile_blueprint,
-                      current_account_name="CurrentAccount")
-
-    manager.dependency_check()
+def get_sorted_module_names(modules):
     G = nx.DiGraph()
     G.add_node("root")
-    # look up all dependencies
-    for module_name, module in manager.modules.items():
+
+    for module_name, module in modules.items():
         if module.run_end_of_year:
             continue
         G.add_node(module_name)
         for dep_name in module.depends_on_modules:
             G.add_edge(dep_name, module_name)
+            # FIXME theoretical end_of_year module can appear here, too.
+            # FIXME instead add psedo end of year module and add dependencies
         for modify_name in module.modifies_modules:
             G.add_edge(module_name, modify_name)
     # check for loop
@@ -46,11 +35,29 @@ def get_sorted_module_blueprints(config):
         if len(G.in_edges(node)) < 1:
             G.add_edge("root", node)
     # Traverse Graph
-    dep_checked_list = list(reversed(list(nx.dfs_postorder_nodes(G, source="root"))))[1:]
-    sorted_modules = []
-    for module_name in dep_checked_list:
-        sorted_modules += [m for m in module_blueprints if m.name == module_name]
+    sorted_module_names = list(reversed(list(nx.dfs_postorder_nodes(G, source="root"))))[1:]
+    return sorted_module_names
 
+
+# TODO put this method somewhere else, where??!
+def get_sorted_module_blueprints(config):
+    # imports Manager -> no cyclic imports!
+    module_blueprints = get_module_blueprints(config=config, root_module=fup.modules)
+    profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
+
+    # dry run to get dependencies
+    manager = Manager(config=config,
+                      module_blueprints=module_blueprints,
+                      profile_blueprint=profile_blueprint,
+                      current_account_name="CurrentAccount")
+    manager.dependency_check()
+
+    sorted_module_names = get_sorted_module_names(modules=manager.modules)
+
+    sorted_modules = []
+    for module_name in sorted_module_names:
+        sorted_modules += [m for m in module_blueprints if m.name == module_name]
+    # FIXME remove special treatment of end of year
     for module_name, module in manager.modules.items():
         if module.run_end_of_year:
             sorted_modules += [m for m in module_blueprints if m.name == module_name]

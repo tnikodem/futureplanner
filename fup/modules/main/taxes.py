@@ -39,8 +39,7 @@ class Taxes(ChangeModule):
             taxable_income_min = self.tax_rates.taxable_income[index_tax_min]
             tax_rate_max = self.tax_rates.tax_rate[index_tax_max]
             taxable_income_max = self.tax_rates.taxable_income[index_tax_max]
-            self.tax_rate = tax_rate_min + (self.taxable_income - taxable_income_min) / (
-                    taxable_income_max - taxable_income_min) * (tax_rate_max - tax_rate_min)
+            self.tax_rate = tax_rate_min + (self.taxable_income - taxable_income_min) / (taxable_income_max - taxable_income_min) * (tax_rate_max - tax_rate_min)
 
         self.expenses = self.taxable_income * self.tax_rate
 

@@ -10,6 +10,7 @@ from fup.modules.main.insurances import Health, Pension, NursingCare, Unemployme
 
 # https://www.gevestor.de/details/steuersatz-in-deutschland-646731.html
 # Tax in 2019, TODO update to 2020?!
+# TODO why not use precise tax calcualtion??!
 def calc_tax(income):
     limit1 = 9168
     limit2 = 14254
@@ -37,18 +38,16 @@ def calc_tax(income):
 
 inflation_build_config = {"inflation_mean": 0, "inflation_std": 1}
 
-pension_config = {
-        "entgeltpunkte": 0,  # your points
-        "rentenwert": 34.19,  # €/Entgeltpunkt/month, 2020
-        "durchschnittseinkommen": 40551,  # € per year, 2020
-        "fraction_of_income": 0.186 * 0.5,  # 2020  (half employer, half employee)
-        "income_threshold": 82800,  # € per year, 2020
-}
+pension_config = {"entgeltpunkte": 0,  # your points
+                  "rentenwert": 34.19,  # €/Entgeltpunkt/month, 2020
+                  "durchschnittseinkommen": 40551,  # € per year, 2020
+                  "fraction_of_income": 0.186 * 0.5,  # 2020  (half employer, half employee)
+                  "income_threshold": 82800,  # € per year, 2020
+                  }
 
 unemployed_config = {"fraction_of_income": 0.024 * 0.5,
                      "retirement_factor": 0,
                      "income_threshold": 82800,
-
                      "months_you_get_unemployment_money": 12,
                      "salary_fraction": 0.8 * 0.6,  # ~50%
                      }
@@ -57,17 +56,16 @@ unemployed_config = {"fraction_of_income": 0.024 * 0.5,
 # https://www.lohn-info.de/durchschnittssteuersatz_grenzsteuersatz.html
 tax_build_config = {
     # linear interpolation between points
-    "tax_rates": [
-                    {"taxable_income": 0+9168, "tax_rate": 0.},
-                    {"taxable_income": 3000+9168, "tax_rate": 0.04},
-                    {"taxable_income": 8000+9168, "tax_rate": 0.1},
-                    {"taxable_income": 15000+9168, "tax_rate": 0.147},
-                    {"taxable_income": 26000+9168, "tax_rate": 0.20},
-                    {"taxable_income": 42000+9168, "tax_rate": 0.25},
-                    {"taxable_income": 64000+9168, "tax_rate": 0.303},
-                    {"taxable_income": 116000+9168, "tax_rate": 0.355},
-                    {"taxable_income": 325000+9168, "tax_rate": 0.405},
-                    {"taxable_income": 827000+9168, "tax_rate": 0.43}],
+    "tax_rates": [{"taxable_income": 0 + 9168, "tax_rate": 0.},
+                  {"taxable_income": 3000 + 9168, "tax_rate": 0.04},
+                  {"taxable_income": 8000 + 9168, "tax_rate": 0.1},
+                  {"taxable_income": 15000 + 9168, "tax_rate": 0.147},
+                  {"taxable_income": 26000 + 9168, "tax_rate": 0.20},
+                  {"taxable_income": 42000 + 9168, "tax_rate": 0.25},
+                  {"taxable_income": 64000 + 9168, "tax_rate": 0.303},
+                  {"taxable_income": 116000 + 9168, "tax_rate": 0.355},
+                  {"taxable_income": 325000 + 9168, "tax_rate": 0.405},
+                  {"taxable_income": 827000 + 9168, "tax_rate": 0.43}],
     "taxable_incomes": ["main.work.Job", "main.insurances.Pension"],
     "tax_offsets": ["main.insurances.Health", "main.insurances.NursingCare",
                     "main.insurances.Pension", "main.insurances.Unemployment"]
@@ -81,21 +79,21 @@ def test_taxes(default_manager):
                                              build_class=Inflation))
         default_manager.add_module(BluePrint(name="main.work.Job",
                                              build_config={"income": income,
-                                                           "salary_per_month": income/12,
+                                                           "salary_per_month": income / 12,
                                                            "unemployed_months": 0,
                                                            "unemployed_months_this_year": 0,
                                                            }, build_class=Module))
         default_manager.add_module(BluePrint(name="main.insurances.Pension", build_config=pension_config,
                                              build_class=Pension))
-        default_manager.add_module(BluePrint(name="main.insurances.Health",
+        default_manager.add_module(BluePrint(name="main.insurances.Health", build_class=Health,
                                              build_config={"fraction_of_income": 0.073,  # 2020
                                                            "income_threshold": 56250,  # €/year , 2020
-                                                          }, build_class=Health))
-        default_manager.add_module(BluePrint(name="main.insurances.NursingCare",
+                                                           },))
+        default_manager.add_module(BluePrint(name="main.insurances.NursingCare", build_class=NursingCare,
                                              build_config={"fraction_of_income": 0.0165,  # 2020
                                                            "retirement_factor": 2,
                                                            "income_threshold": 56250,  # €/year , 2020
-                                                          }, build_class=NursingCare))
+                                                           },))
         default_manager.add_module(BluePrint(name="main.insurances.Unemployment", build_config=unemployed_config,
                                              build_class=Unemployment))
         default_manager.add_module(BluePrint(name="Tax", build_config=tax_build_config, build_class=Taxes))

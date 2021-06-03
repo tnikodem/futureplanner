@@ -1,8 +1,6 @@
 from fup.core.config import BluePrint
 from fup.core.manager import Manager
 from fup.core.module import ChangeModule, AssetModule
-from fup.core.functions import get_blueprint
-import fup.modules
 
 
 class Change1(ChangeModule):

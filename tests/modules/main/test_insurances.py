@@ -160,9 +160,8 @@ def test_unemployment(default_manager):
     unemployed_config = {"fraction_of_income": 0.024 * 0.5,
                          "retirement_factor": 0,
                          "income_threshold": 82800,
-
                          "months_you_get_unemployment_money": 12,
-                         "salary_fraction": 0.8*0.6,  #  ~50%
+                         "salary_fraction": 0.8 * 0.6,  # ~50%
                          }
 
     default_manager.add_module(BluePrint(name="unemployment", build_config=unemployed_config,
@@ -215,4 +214,4 @@ def test_unemployment(default_manager):
     default_manager.get_module("main.work.Job").prob_lose_job = 0.2
     default_manager.next_year()
     unemployed_months = default_manager.get_module("main.work.Job").unemployed_months_this_year
-    assert default_manager.get_module("unemployment").income == pytest.approx(82800 * 0.8 * 0.6 * unemployed_months/12)
+    assert default_manager.get_module("unemployment").income == pytest.approx(82800 * 0.8 * 0.6 * unemployed_months / 12)
