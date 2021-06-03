@@ -19,7 +19,7 @@ def test_full_investment():
 
     profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
 
-    manager = Manager(config=config, profile_blueprint=profile_blueprint)
+    manager = Manager(config=config, profile_blueprint=profile_blueprint, current_account_name="CurrentAccount")
     assert manager.profile.retired is False
     for i in range(10):
         manager.next_year()

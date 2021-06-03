@@ -12,17 +12,22 @@ import fup.modules
 # TODO put this method somewhere else, where??!
 def get_sorted_module_blueprints(config):
     # imports Manager -> no cyclic imports!
-    module_list = get_module_blueprints(config=config, root_module=fup.modules)
+    module_blueprints = get_module_blueprints(config=config, root_module=fup.modules)
     profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
 
     # dry run to get dependencies
-    manager = Manager(config, module_list, profile_blueprint=profile_blueprint)
+    manager = Manager(config,
+                      module_blueprints=module_blueprints,
+                      profile_blueprint=profile_blueprint,
+                      current_account_name="CurrentAccount")
+
     manager.dependency_check()
     G = nx.DiGraph()
     G.add_node("root")
     # look up all dependencies
-    for module_name in manager.modules:
-        module = manager.modules[module_name]
+    for module_name, module in manager.modules.items():
+        if module.run_end_of_year:
+            continue
         G.add_node(module_name)
         for dep_name in module.depends_on_modules:
             G.add_edge(dep_name, module_name)
@@ -44,9 +49,11 @@ def get_sorted_module_blueprints(config):
     dep_checked_list = list(reversed(list(nx.dfs_postorder_nodes(G, source="root"))))[1:]
     sorted_modules = []
     for module_name in dep_checked_list:
-        sorted_modules += [m for m in module_list if m.name == module_name]
+        sorted_modules += [m for m in module_blueprints if m.name == module_name]
 
-    sorted_modules += get_module_blueprints(config=config, root_module=fup.modules, end_of_year=True)
+    for module_name, module in manager.modules.items():
+        if module.run_end_of_year:
+            sorted_modules += [m for m in module_blueprints if m.name == module_name]
 
     return sorted_modules
 
@@ -60,7 +67,8 @@ def get_start_values(config):
     profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
     manager = fup.core.manager.Manager(config=config,
                                        module_blueprints=sorted_module_blueprints,
-                                       profile_blueprint=profile_blueprint)
+                                       profile_blueprint=profile_blueprint,
+                                       current_account_name="CurrentAccount")
     manager.next_year()
     rows = []
     for module_name in manager.modules:
@@ -68,7 +76,7 @@ def get_start_values(config):
     return pd.DataFrame(rows)
 
 
-def run_simulations(config, runs=100, profile_class=None, debug=False):
+def run_simulations(config, runs=100, debug=False):
     time_start = time.time()
 
     sorted_module_blueprints = get_sorted_module_blueprints(config)
@@ -78,7 +86,8 @@ def run_simulations(config, runs=100, profile_class=None, debug=False):
     for i in range(runs):
         manager = fup.core.manager.Manager(config=config,
                                            module_blueprints=sorted_module_blueprints,
-                                           profile_blueprint=profile_blueprint)
+                                           profile_blueprint=profile_blueprint,
+                                           current_account_name="CurrentAccount")
 
         rows = []
         for i_year in range(config["simulation"]["end_year"] - config["simulation"]["start_year"]):

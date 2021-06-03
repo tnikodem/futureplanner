@@ -2,13 +2,14 @@ from fup.core.functions import get_full_class_name
 
 
 class Module:
-    def __init__(self, name="", manager=None, **kwargs):
+    def __init__(self, name="", manager=None, run_end_of_year=False, **kwargs):
         self.name = name
         self.manager = manager
         self.depends_on_modules = set()
         self.modifies_modules = set()
         self.dependency_check = False
         self.reset_values = dict()
+        self.run_end_of_year = run_end_of_year
 
         for k, v in kwargs.items():
             assert isinstance(k, str)
@@ -163,8 +164,7 @@ class ChangeModule(Module):
         self.expenses = 0
 
         self.next_year()
-        # TODO write better, how?!
-        self.manager.get_module("assets.money.Money").count += self.income - self.expenses
+        self.manager.current_account.change(self.income - self.expenses)
 
         self.df_row["income"] = self.df_row.get("income", 0) + self.income
         self.df_row["expenses"] = self.df_row.get("expenses", 0) + self.expenses

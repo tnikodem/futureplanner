@@ -36,16 +36,16 @@ def test_get_module_config_list():
         }
     }
     module_config_list = get_module_blueprints(root_module=fup.modules, config=config)
-    assert len(module_config_list) == 2
+    assert len(module_config_list) == 3
     assert module_config_list[0].name == "main.environment.Inflation"
     assert module_config_list[0].build_class == fup.modules.main.environment.Inflation
     assert module_config_list[0].build_config["inflation_mean"] == 2.2
+
     assert module_config_list[1].name == "Job"
     assert module_config_list[1].build_config == {"start_income": 42000}
     assert module_config_list[1].build_class == fup.modules.main.work.Job
 
-    module_config_list = get_module_blueprints(root_module=fup.modules, config=config, end_of_year=True)
-    assert len(module_config_list) == 1
-    assert module_config_list[0].name == "main.investing.Investing"
-    assert module_config_list[0].build_class == fup.modules.main.investing.Investing
-    assert module_config_list[0].build_config == {"assets_ratios": {"test": 0.4}}
+    assert module_config_list[2].name == "main.investing.Investing"
+    assert module_config_list[2].build_class == fup.modules.main.investing.Investing
+    assert module_config_list[2].build_config == {"assets_ratios": {"test": 0.4}}
+    assert module_config_list[2].run_end_of_year is True

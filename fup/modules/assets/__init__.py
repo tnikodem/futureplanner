@@ -1,1 +1,1 @@
-from fup.modules.assets import credit, money, real_estate, investment
+from fup.modules.assets import money, real_estate, investment, bank

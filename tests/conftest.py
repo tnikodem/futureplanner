@@ -18,7 +18,7 @@ def default_config():
             "class": "profiles.profiles.FullInvestment",
             "birth_year": 2000,
             "retirement_year": 2010,
-        }
+        },
     }
 
 
@@ -37,9 +37,6 @@ def modules_config(default_config):
             "assets_ratios": {
                 "stocks": 0.4,
             },
-        },
-        "assets.money.Money": {
-            "start_money_value": 1000,
         },
         "stocks": {"class": "assets.investment.Standard",
                    "start_money_value": 0,
@@ -67,15 +64,28 @@ def modules_config(default_config):
                 {"taxable_income": 827000 + 9168, "tax_rate": 0.43}],
             "taxable_incomes": ["Job"],
             "tax_offsets": []
-        }
+        },
+        "CurrentAccount": {
+            "class": "assets.bank.CurrentAccount",
+            "run_end_of_year": True,
+            "start_money_value": 1000,
+            "penalty_interest_limit": 50000,
+            "penalty_interest_rate": 0.05,
+            "overdraft_rate": 0.0775,
+        },
     }
     return default_config
 
 
 @pytest.fixture(scope="function")
-def default_manager(default_config):
+def default_profile_blueprint(default_config):
+    return get_blueprint(config=default_config["profile"], root_module=fup.profiles)
+
+
+@pytest.fixture(scope="function")
+def default_manager(default_config, default_profile_blueprint):
     module_blueprints = [
-        BluePrint(name="assets.money.Money", build_config={"start_money_value": 0}, build_class=AssetModule),
+        BluePrint(name="CurrentAccount", build_config={"start_money_value": 0}, build_class=AssetModule),
     ]
-    profile_blueprint = get_blueprint(config=default_config["profile"], root_module=fup.profiles)
-    return Manager(config=default_config, module_blueprints=module_blueprints, profile_blueprint=profile_blueprint)
+    return Manager(config=default_config, profile_blueprint=default_profile_blueprint,
+                   current_account_name="CurrentAccount", module_blueprints=module_blueprints)

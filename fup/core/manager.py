@@ -3,26 +3,28 @@ import copy
 
 
 class Manager:
-    def __init__(self, config, module_blueprints=None, profile_blueprint=None):
+    def __init__(self, config, profile_blueprint, current_account_name, module_blueprints=None):
         self.config = copy.deepcopy(config)
         self.year = config["simulation"]["start_year"]
         self.modules = collections.OrderedDict()
-        self.profile = None  # Profile to provide information for modules about current situation of life
+        self.profile = profile_blueprint.build_class(manager=self, **profile_blueprint.build_config)
+        self.current_account_name = current_account_name
+
         self.df_row = dict(year=self.year)
 
         if module_blueprints is not None:
             for module_blueprint in module_blueprints:  # TODO put sorting of dependencies here?!  - you only want to do sorting once...
                 self.add_module(module_blueprint)
-        if profile_blueprint is not None:
-            self.add_profile(profile_blueprint)
+
+    @property
+    def current_account(self):
+        return self.modules[self.current_account_name]
 
     def add_module(self, module_blueprint):
         self.modules[module_blueprint.name] = module_blueprint.build_class(name=module_blueprint.name,
                                                                            manager=self,
+                                                                           run_end_of_year=module_blueprint.run_end_of_year,
                                                                            **module_blueprint.build_config)
-
-    def add_profile(self, profile_blueprint):
-        self.profile = profile_blueprint.build_class(manager=self, **profile_blueprint.build_config)
 
     def get_module(self, module_name):
         return self.modules[module_name]

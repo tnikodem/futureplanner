@@ -4,8 +4,10 @@ from fup.core.manager import Manager
 from fup.core.module import Module, AssetModule, ChangeModule
 
 
-def test_module(default_config):
-    manager = Manager(config=default_config)
+def test_module(default_config, default_profile_blueprint):
+    manager = Manager(config=default_config,
+                      current_account_name="CurrentAccount",
+                      profile_blueprint=default_profile_blueprint)
 
     # Setup
     # plain module
@@ -62,12 +64,13 @@ def test_change_module(default_manager):
     assert info["expenses"] == 500
 
 
-def test_assets_module(default_config):
+def test_assets_module(default_config, default_profile_blueprint):
+    manager = Manager(config=default_config,
+                      profile_blueprint=default_profile_blueprint,
+                      current_account_name="CurrentAccount")
+
     gains_tax = 0.25
     exchange_fee = 0.1
-
-    manager = Manager(config=default_config)
-
     manager.add_module(BluePrint(name="test", build_config={"start_money_value": 1000,
                                                             "gains_tax": gains_tax,
                                                             "exchange_fee": exchange_fee

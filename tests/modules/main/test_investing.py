@@ -19,6 +19,6 @@ def test_investing(default_manager):
     }
     default_manager.add_module(BluePrint(name="investing", build_config=build_config, build_class=Investing))
     default_manager.next_year()
-    assert default_manager.total_assets == pytest.approx(1100)
+    assert default_manager.total_assets == pytest.approx(1000 + 100)
     assert default_manager.get_module("test").money_value == pytest.approx(0.4 * 1100)
     assert default_manager.get_module("test2").money_value == pytest.approx(0.1 * 1100)

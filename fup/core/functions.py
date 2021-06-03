@@ -37,35 +37,36 @@ def get_blueprint(config, root_module):
     config = copy.deepcopy(config)
     assert "class" in config
     all_module_classes = get_all_modules(root_module=root_module)
-    assert config["class"] in all_module_classes
+    assert config["class"] in all_module_classes, all_module_classes
     build_class = all_module_classes[config["class"]]
     del config["class"]
 
     return BluePrint(build_class=build_class, build_config=config)
 
 
-def get_module_blueprints(root_module, config, end_of_year=False):
+def get_module_blueprints(root_module, config):
     config = copy.deepcopy(config)  # FIXME, class and run_end_of_year is "cleaned"
     standard_modules = get_all_modules(root_module=root_module)
 
-    blueprint_list = []
+    blueprint_list = list()
     for name in config["modules"].keys():
         build_config = config["modules"][name]
         if build_config is None:
-            build_config = {}
+            build_config = dict()
 
-        if end_of_year:
-            if "run_end_of_year" not in build_config or not build_config["run_end_of_year"]:
-                continue
+        run_end_of_year = False
+        if "run_end_of_year" in build_config:
+            run_end_of_year = build_config["run_end_of_year"]
             del build_config["run_end_of_year"]
-        else:
-            if "run_end_of_year" in build_config and build_config["run_end_of_year"]:
-                continue
 
         if "class" in build_config:
             build_class = standard_modules[build_config["class"]]
             del build_config["class"]
         else:
             build_class = standard_modules[name]
-        blueprint_list += [BluePrint(name=name, build_config=build_config, build_class=build_class)]
+
+        blueprint_list += [BluePrint(name=name,
+                                     run_end_of_year=run_end_of_year,
+                                     build_config=build_config,
+                                     build_class=build_class)]
     return blueprint_list
