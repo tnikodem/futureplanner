@@ -6,7 +6,43 @@ from fup.core.config import BluePrint
 from fup.core.module import AssetModule
 from fup.modules.main.environment import Inflation
 from fup.modules.main.work import Job
-from fup.modules.events.crisis import OilCrisis1973
+from fup.modules.events.crisis import OilCrisis1973, LostDecadeJapan1991
+
+
+def test_lost_decade_japan_1991(default_manager):
+    manager = default_manager
+    crisis_config = {
+        "start_year": 2002
+    }
+    manager.add_module(BluePrint(name="crisis", build_config=crisis_config, build_class=LostDecadeJapan1991))
+    build_config = {"inflation_mean": 2, "inflation_std": 0}
+    default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
+                                         build_class=Inflation))
+    manager.add_module(BluePrint(name="assets.resources.Gold", build_config={"start_money_value": 500},
+                                 build_class=AssetModule))
+    manager.add_module(BluePrint(name="assets.stocks.Stocks", build_config={"start_money_value": 500},
+                                 build_class=AssetModule))
+
+    # TODO refactor, this looks very similar to the run_simulation method
+    rows = []
+    for i in range(20):
+        default_manager.next_year()
+        df_row = default_manager.df_row
+        df_row["stocks_asset_value"] = manager.get_module("assets.stocks.Stocks").asset_value
+        df_row["gold_asset_value"] = manager.get_module("assets.resources.Gold").asset_value
+        rows += [df_row]
+    df = pd.DataFrame(rows)
+
+    assert df["event"].notnull().sum() == 18
+
+    assert df["inflation"].values[-1] == 1.02
+    assert df["inflation"].max() == 1.03
+
+    assert df["stocks_asset_value"].max() == pytest.approx(1.75, 1e-3)  # bubble max
+    assert df["stocks_asset_value"].values[-1] == pytest.approx(0.65, 0.05)
+
+    assert df["gold_asset_value"].max() == 1  # no bubble, only going down
+    assert df["gold_asset_value"].values[-1] == pytest.approx(0.6, 1e-3)
 
 
 def test_oil_crisis_1973_fixed_year(default_manager):

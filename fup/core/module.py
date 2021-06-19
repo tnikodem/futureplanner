@@ -1,3 +1,4 @@
+import random
 from fup.core.functions import get_full_class_name
 
 
@@ -8,7 +9,6 @@ class Module:
         self.depends_on_modules = set()
         self.modifies_modules = set()
         self.dependency_check = False
-        self.reset_values = dict()
         self.run_end_of_year = run_end_of_year
 
         for k, v in kwargs.items():
@@ -36,15 +36,23 @@ class Module:
             self.depends_on_modules.add(module_name)
         return getattr(self.manager.get_module(module_name), prop_name)
 
-    def change_prop(self, prop_name, change_value):
+    def add_prop(self, prop_name, change_value):
         prop_value = getattr(self, prop_name)
-        prop_value *= change_value
-        setattr(self, prop_name, prop_value)
+        setattr(self, prop_name, prop_value+change_value)
 
-    def get_prop_changer(self, module_name, prop_name):
+    def multiply_prop(self, prop_name, change_value):
+        prop_value = getattr(self, prop_name)
+        setattr(self, prop_name, prop_value*change_value)
+
+    def get_prop_adder(self, module_name, prop_name):
         if self.dependency_check:
             self.modifies_modules.add(module_name)
-        return lambda x: self.manager.get_module(module_name).change_prop(prop_name=prop_name, change_value=x)
+        return lambda x: self.manager.get_module(module_name).add_prop(prop_name=prop_name, change_value=x)
+
+    def get_prop_multiplier(self, module_name, prop_name):
+        if self.dependency_check:
+            self.modifies_modules.add(module_name)
+        return lambda x: self.manager.get_module(module_name).multiply_prop(prop_name=prop_name, change_value=x)
 
     # wrapper which can be overwritten by submodule class
     def next_year_wrapper(self):
@@ -111,12 +119,26 @@ class EventModule(Module):
         self.start_year = start_year
         self.probability = probability
         self.active = False
+        self.crisis_year = 0
 
     def get_extra_info(self):
         return f"start: {self.start_year}"
 
     def next_year_wrapper(self):
+        if not self.dependency_check:
+            if self.probability and not self.active:
+                if self.config["simulation"]["random"]:
+                    if random.random() < self.probability:
+                        self.start_year = self.manager.year
+
+            if self.start_year is None or self.manager.year < self.start_year:
+                return
+
+            self.active = True
+            self.crisis_year = self.manager.year - self.start_year
+
         self.next_year()
+
         if self.active:
             if "event" in self.df_row:
                 self.df_row["event"] += "," + self.name

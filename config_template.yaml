@@ -114,6 +114,9 @@ modules:
   crisis_2045:
     class: events.crisis.OilCrisis1973
     start_year: 2045
+  crisis_2055:
+    class: events.crisis.LostDecadeJapan1991
+    start_year: 2055
 
   CurrentAccount:
     class: assets.bank.CurrentAccount

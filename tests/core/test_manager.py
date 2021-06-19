@@ -17,8 +17,8 @@ class Change2(ChangeModule):
 
 class Change3(ChangeModule):
     def next_year(self):
-        change_value1 = self.get_prop_changer("test1", "value1")
-        change_value1(2)
+        multiply_value1 = self.get_prop_multiplier("test1", "value1")
+        multiply_value1(2)
         self.income = 100
 
 

@@ -20,7 +20,7 @@ def test_module(default_config, default_profile_blueprint):
     # getter
     assert manager.get_module("test").get_prop("test2", "test_parm") == 123
     # setter
-    change_test_param = manager.get_module("test").get_prop_changer("test2", "test_parm")
+    change_test_param = manager.get_module("test").get_prop_multiplier("test2", "test_parm")
     change_test_param(2)
     assert manager.get_module("test2").test_parm == 246
 
