@@ -1,5 +1,29 @@
 import pytest
-from fup.utils.simulation_utils import get_sorted_module_blueprints, get_start_values, run_simulations
+from fup.utils.simulation_utils import overwrite_config, get_sorted_module_blueprints, get_start_values, run_simulations
+
+
+def test_overwrite_config():
+    a = dict(a=dict(b="c"))
+    b = dict(d=dict(e="f"))
+    overwrite_config(a, b)
+    assert "d" in a
+    a = dict(a=dict(b="c"))
+    b = dict(a=dict(b="f"))
+    overwrite_config(a, b)
+    assert a["a"]["b"] == "f"
+    a = dict(a=dict(b="c"))
+    b = dict(a="d")
+    overwrite_config(a, b)
+    assert a["a"] == "d"
+    a = dict(a="b")
+    b = dict(a=dict(b="f"))
+    overwrite_config(a, b)
+    assert a["a"]["b"] == "f"
+    a = dict(a=dict(b="c", d="e"))
+    b = dict(a=dict(b="f"))
+    overwrite_config(a, b)
+    assert a["a"]["b"] == "f"
+    assert a["a"]["d"] == "e"
 
 
 def test_get_sorted_module_blueprints(modules_config):

@@ -8,6 +8,14 @@ import fup.profiles
 import fup.modules
 
 
+def overwrite_config(a, b):
+    for key in b:
+        if isinstance(a.get(key), dict) and isinstance(b.get(key), dict):
+            overwrite_config(a[key], b[key])
+        else:
+            a[key] = b[key]
+
+
 def get_sorted_module_names(modules):
     G = nx.DiGraph()
     G.add_node("root")
