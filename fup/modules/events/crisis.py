@@ -45,7 +45,7 @@ class OilCrisis1973(EventModule):
 class LostDecadeJapan1991(EventModule):
     """
     https://en.wikipedia.org/wiki/Lost_Decade_(Japan)
-    Stagnation: Asset price BUBBLE collapse
+    Stagnation: Asset price BUBBLE + collapse
     "Window guidance" policy
 
     inflation
@@ -56,7 +56,7 @@ class LostDecadeJapan1991(EventModule):
     2002: -1%
     2005: 0%
 
-    real estate: TOD implement real estate
+    real estate: TODO implement real estate
     https://upload.wikimedia.org/wikipedia/commons/3/36/Sum_japan.svg
     1987: 100
     1990: 200
@@ -112,9 +112,71 @@ class LostDecadeJapan1991(EventModule):
             self.active = False
 
 
-class GlobalFinanceCrisis2008(EventModule):
-    pass
+class GreatRecession2007(EventModule):
+    """
+    https://en.wikipedia.org/wiki/Great_Recession
+    Recession + Housing price BUBBLE
+
+    real estate: TODO implement real estate
+    https://de.wikipedia.org/wiki/Datei:Case-Shiller_National_Home_Price_Index.svg
+    2004: 140
+    2006: 190
+    2007: 190
+    2009: 130
+
+    inflation:
+    https://www.macrotrends.net/countries/USA/united-states/inflation-rate-cpi
+    2009: -0.5%, otherwise normal
+    2010: 1%
+
+    unemployment:
+    https://www.statista.com/statistics/193290/unemployment-rate-in-the-usa-since-1990/
+    2009-2011: double
+
+    stocks:
+    https://www.lynxbroker.ch/boerse/boerse-kurse/etf/die-besten-etfs/msci-world-die-besten-etfs-auf-den-weltindex/
+    2004: 1000
+    2008: 1600
+    2009: 800
+    2010: 1200
+
+    gold:
+    https://www.macrotrends.net/1333/historical-gold-prices-100-year-chart
+    2004: 600
+    2010: 1500
+
+    """
+
+    def next_year(self):
+        multiply_prob_lose_job = self.get_prop_multiplier("main.work.Job", "prob_lose_job")
+        multiply_prob_find_job = self.get_prop_multiplier("main.work.Job", "prob_find_job")
+        add_mean_inflation = self.get_prop_adder("main.environment.Inflation", "inflation_mean")
+        multiply_stocks = self.get_prop_multiplier("assets.stocks.Stocks", "asset_value")
+        multiply_gold = self.get_prop_multiplier("assets.resources.Gold", "asset_value")
+
+        # TODO better handling of module start values
+        inflation_mean_start = self.manager.get_module("main.environment.Inflation").inflation_mean_start
+
+        # start 2005
+        if self.crisis_year < 4:  # till 2008
+            multiply_stocks(1.12468)
+            multiply_gold(1.164)
+        elif self.crisis_year == 4:  # 2009, crash
+            multiply_prob_lose_job(2)
+            multiply_prob_find_job(0.5)
+            add_mean_inflation(-inflation_mean_start-0.5)
+            multiply_stocks(0.5)
+            multiply_gold(1.164)
+        elif self.crisis_year == 5:  # 2010
+            add_mean_inflation(1)
+            multiply_stocks(1.5)
+            multiply_gold(1.164)
+        else:  # reset
+            multiply_prob_lose_job(0.5)
+            multiply_prob_find_job(2)
+            add_mean_inflation(inflation_mean_start-0.5)
+            self.active = False
 
 
-class WorldFinanceCrisis1929(EventModule):
+class GreatDepression1929(EventModule):
     pass

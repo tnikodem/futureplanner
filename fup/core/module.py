@@ -131,10 +131,12 @@ class EventModule(Module):
                     if random.random() < self.probability:
                         self.start_year = self.manager.year
 
-            if self.start_year is None or self.manager.year < self.start_year:
+            if self.start_year == self.manager.year:
+                self.active = True
+
+            if not self.active:
                 return
 
-            self.active = True
             self.crisis_year = self.manager.year - self.start_year
 
         self.next_year()
