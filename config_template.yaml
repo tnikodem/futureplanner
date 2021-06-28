@@ -108,6 +108,7 @@ modules:
       - main.insurances.NursingCare
       - main.insurances.Pension
       - main.insurances.Unemployment
+    church_tax_rate: 8  # additional percent of tax
 
   events.crisis.OilCrisis1973:
     probability: 0.07
