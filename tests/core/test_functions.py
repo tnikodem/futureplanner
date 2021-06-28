@@ -21,7 +21,7 @@ def test_get_module_config_list():
     config = {
         "modules": {
             "main.environment.Inflation": {
-                "inflation_mean": 2.2
+                "inflation_mean": 1.022
             },
             "Job": {
                 "start_income": 42000,
@@ -39,7 +39,7 @@ def test_get_module_config_list():
     assert len(module_config_list) == 3
     assert module_config_list[0].name == "main.environment.Inflation"
     assert module_config_list[0].build_class == fup.modules.main.environment.Inflation
-    assert module_config_list[0].build_config["inflation_mean"] == 2.2
+    assert module_config_list[0].build_config["inflation_mean"] == 1.022
 
     assert module_config_list[1].name == "Job"
     assert module_config_list[1].build_config == {"start_income": 42000}

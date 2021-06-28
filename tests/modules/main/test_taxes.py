@@ -36,7 +36,7 @@ def calc_tax(income):
     return income * par5_a - par5_b
 
 
-inflation_build_config = {"inflation_mean": 0, "inflation_std": 1}
+inflation_build_config = {"inflation_mean": 1, "inflation_std": 0.01}
 
 pension_config = {"entgeltpunkte": 0,  # your points
                   "rentenwert": 34.19,  # €/Entgeltpunkt/month, 2020

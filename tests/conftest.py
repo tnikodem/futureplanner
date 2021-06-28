@@ -1,7 +1,7 @@
 import pytest
 from fup.core.config import BluePrint
 from fup.core.manager import Manager
-from fup.core.module import AssetModule
+from fup.modules.assets.bank import CurrentAccount
 from fup.core.functions import get_blueprint
 import fup.profiles
 
@@ -47,8 +47,8 @@ def modules_config(default_config):
                    "value_increase_std": 0.1,
                    },
         "main.environment.Inflation": {
-            "inflation_mean": 2.,
-            "inflation_std": 2
+            "inflation_mean": 1.02,
+            "inflation_std": 0.02
         },
         "main.taxes.Taxes": {
             "tax_rates": [
@@ -85,7 +85,7 @@ def default_profile_blueprint(default_config):
 @pytest.fixture(scope="function")
 def default_manager(default_config, default_profile_blueprint):
     module_blueprints = [
-        BluePrint(name="CurrentAccount", build_config={"start_money_value": 0}, build_class=AssetModule),
+        BluePrint(name="CurrentAccount", build_config={"start_money_value": 0}, build_class=CurrentAccount),
     ]
     return Manager(config=default_config, profile_blueprint=default_profile_blueprint,
                    current_account_name="CurrentAccount", module_blueprints=module_blueprints)

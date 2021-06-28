@@ -10,11 +10,12 @@ class Job(ChangeModule):
     # - Lower salary?
     # - Compensation
 
-    def __init__(self, start_income, prob_find_job, prob_lose_job, unemployed_months,
-                 name="", manager=None, **kwargs):
+    def __init__(self, start_income, prob_find_job, prob_lose_job, unemployed_months=0,
+                 salary_increase=1, name="", manager=None, **kwargs):
         super().__init__(name=name, manager=manager, **kwargs)
 
         self.salary_per_month = start_income / 12
+        self.salary_increase = salary_increase
 
         self.prob_find_job = prob_find_job
         self.prob_lose_job = prob_lose_job
@@ -24,7 +25,7 @@ class Job(ChangeModule):
 
     def next_year(self):
         inflation = self.get_prop("main.environment.Inflation", "inflation")
-        self.salary_per_month *= inflation
+        self.salary_per_month *= self.salary_increase * inflation
 
         if self.manager.profile.retired:
             self.unemployed_months_this_year = 0

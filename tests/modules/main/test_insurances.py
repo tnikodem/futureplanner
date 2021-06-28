@@ -14,7 +14,7 @@ def test_pension(default_manager):
       https://www.handelsblatt.com/politik/deutschland/rentenpunkte-erklaert-so-errechnen-sie-2021-mit-rentenpunkten-die-hoehe-ihrer-gesetzlichen-rente/26969926.html?ticket=ST-4923658-1gjQbaUz5TlgEFV2rId6-ap6
       https://www.finanztip.de/beitragsbemessungsgrenze/
     """
-    build_config = {"inflation_mean": 0, "inflation_std": 1}
+    build_config = {"inflation_mean": 1, "inflation_std": 0.01}
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
                                          build_class=Inflation))
     default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 0},
@@ -53,7 +53,7 @@ def test_pension(default_manager):
 
 
 def test_pension_expected_income(default_manager):
-    build_config = {"inflation_mean": 0, "inflation_std": 1}
+    build_config = {"inflation_mean": 1, "inflation_std": 0.01}
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
                                          build_class=Inflation))
     default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 40551},
@@ -76,7 +76,7 @@ def test_insurance_health(default_manager):
       ~14.6% (half employer, half employee)
     """
 
-    inflation_build_config = {"inflation_mean": 0, "inflation_std": 0}
+    inflation_build_config = {"inflation_mean": 1, "inflation_std": 0.01}
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
                                          build_class=Inflation))
     default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 10000},
@@ -101,7 +101,7 @@ def test_insurance_nursing_care(default_manager):
       https://www.finanztip.de/beitragsbemessungsgrenze/
       ~3.3% (half employer, half employee), full when retired
     """
-    inflation_build_config = {"inflation_mean": 0, "inflation_std": 0}
+    inflation_build_config = {"inflation_mean": 1, "inflation_std": 0.01}
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
                                          build_class=Inflation))
     default_manager.add_module(BluePrint(name="main.work.Job", build_config={"income": 10000}, build_class=Module))
@@ -146,7 +146,7 @@ def test_unemployment(default_manager):
 
 
     """
-    inflation_build_config = {"inflation_mean": 0, "inflation_std": 0}
+    inflation_build_config = {"inflation_mean": 1, "inflation_std": 0.0}
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
                                          build_class=Inflation))
     job_build_config = {

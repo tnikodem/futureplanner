@@ -12,8 +12,8 @@ profile:
 
 modules:
   main.environment.Inflation:
-    inflation_mean: 2.2
-    inflation_std: 2
+    inflation_mean: 1.022
+    inflation_std: .02
   main.work.Job:
     start_income: 42000
     unemployed_months: 0
@@ -111,6 +111,9 @@ modules:
 
   events.crisis.OilCrisis1973:
     probability: 0.07
+  crisis_2035:
+    class: events.crisis.GermanHyperinflation1914
+    start_year: 2035
   crisis_2045:
     class: events.crisis.OilCrisis1973
     start_year: 2045

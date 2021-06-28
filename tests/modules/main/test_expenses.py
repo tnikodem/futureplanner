@@ -4,7 +4,7 @@ from fup.modules.main.expenses import InflationSensitive, InflationSensitiveVari
 
 
 def test_inflation_sensitive_expenses(default_manager):
-    build_config = {"inflation_mean": 10, "inflation_std": 1}
+    build_config = {"inflation_mean": 1.1, "inflation_std": 0.01}
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
                                          build_class=Inflation))
     default_manager.add_module(BluePrint(name="test", build_config={"start_expenses": 1000, "info_name": "test"},
@@ -17,7 +17,7 @@ def test_inflation_sensitive_expenses(default_manager):
 
 
 def test_inflation_sensitive_variable_expenses(default_manager):
-    build_config = {"inflation_mean": 10, "inflation_std": 1}
+    build_config = {"inflation_mean": 1.1, "inflation_std": 0.01}
     default_manager.profile.money_level = 10
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=build_config,
                                          build_class=Inflation))

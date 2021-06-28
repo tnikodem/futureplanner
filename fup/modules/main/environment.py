@@ -13,9 +13,10 @@ class Inflation(Module):
 
     def next_year(self):
         if self.config["simulation"]["random"]:
-            self.inflation = 1 + random.gauss(mu=self.inflation_mean, sigma=self.inflation_std) / 100
+            self.inflation = self.inflation_mean * max(random.gauss(mu=1, sigma=self.inflation_std), 1e-30)
         else:
-            self.inflation = 1 + self.inflation_mean / 100
+            self.inflation = self.inflation_mean
+
         self.total_inflation *= self.inflation
 
         self.df_row["inflation"] = self.inflation

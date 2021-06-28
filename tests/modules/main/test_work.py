@@ -7,7 +7,7 @@ from fup.modules.main.work import Job
 
 
 def test_taxes(default_manager):
-    inflation_build_config = {"inflation_mean": 2, "inflation_std": 0}
+    inflation_build_config = {"inflation_mean": 1.02, "inflation_std": 0}
     default_manager.add_module(BluePrint(name="main.environment.Inflation", build_config=inflation_build_config,
                                          build_class=Inflation))
     job_build_config = {

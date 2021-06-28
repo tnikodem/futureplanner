@@ -25,19 +25,19 @@ class OilCrisis1973(EventModule):
         if self.crisis_year == 0:
             multiply_prob_lose_job(2)
             multiply_prob_find_job(0.5)
-            multiply_mean_inflation(8.7 / 2.2)
+            multiply_mean_inflation(1.087 / 1.022) #
         elif self.crisis_year == 1:
-            multiply_mean_inflation(12.3 / 8.7)
+            multiply_mean_inflation(1.123 / 1.087) #
             multiply_gold_value(770. / 400.)
             multiply_stocks_value(3181 / 6300)
         elif self.crisis_year == 2:
-            multiply_mean_inflation(6.9 / 12.3)
+            multiply_mean_inflation(1.069 / 1.123) #
             multiply_gold_value(660. / 770.)
             multiply_stocks_value(4100. / 3181.)
         elif self.crisis_year == 3:
             multiply_prob_lose_job(0.5)
             multiply_prob_find_job(2)
-            multiply_mean_inflation(2.2 / 6.9)
+            multiply_mean_inflation(1.022 / 1.069) #
         else:
             self.active = False
 
@@ -80,35 +80,36 @@ class LostDecadeJapan1991(EventModule):
     """
 
     def next_year(self):
-        add_mean_inflation = self.get_prop_adder("main.environment.Inflation", "inflation_mean")
+        multiply_mean_inflation = self.get_prop_multiplier("main.environment.Inflation", "inflation_mean")
+
         multiply_stocks = self.get_prop_multiplier("assets.stocks.Stocks", "asset_value")
         multiply_gold = self.get_prop_multiplier("assets.resources.Gold", "asset_value")
 
-        # TODO better handling of module start values
+        # # TODO better handling of module start values
         inflation_mean_start = self.manager.get_module("main.environment.Inflation").inflation_mean_start
 
         if self.crisis_year < 1:  # 1987, start
-            add_mean_inflation(-inflation_mean_start)
+            multiply_mean_inflation(1/inflation_mean_start)
             multiply_stocks(1.205)
             multiply_gold(0.9319)
         elif self.crisis_year < 3:  # 1990, bubble max
-            add_mean_inflation(3./4.)
+            multiply_mean_inflation(1.00741707178)  # 1.03**(1/4)
             multiply_stocks(1.205)
             multiply_gold(0.9319)
         elif self.crisis_year < 5:  # 1992, crash
-            add_mean_inflation(3./4.)
+            multiply_mean_inflation(1.00741707178)  # 1.03**(1/4)
             multiply_stocks(0.71)
             multiply_gold(0.9319)
         elif self.crisis_year < 13:  # 2000, low
-            add_mean_inflation(-4./8.)
+            multiply_mean_inflation(0.99506)  # (0.99/1.03)**(1/8)
             multiply_stocks(0.975)
             multiply_gold(0.9319)
         elif self.crisis_year < 18:  # 2005, recovery
-            add_mean_inflation(1/5.)
+            multiply_mean_inflation(1.002)  # (1/0.99)**(1/5)
             multiply_stocks(0.975)
             multiply_gold(1.0845)
         else:  # reset
-            add_mean_inflation(inflation_mean_start)
+            multiply_mean_inflation(inflation_mean_start)
             self.active = False
 
 
@@ -150,7 +151,8 @@ class GreatRecession2007(EventModule):
     def next_year(self):
         multiply_prob_lose_job = self.get_prop_multiplier("main.work.Job", "prob_lose_job")
         multiply_prob_find_job = self.get_prop_multiplier("main.work.Job", "prob_find_job")
-        add_mean_inflation = self.get_prop_adder("main.environment.Inflation", "inflation_mean")
+        multiply_mean_inflation = self.get_prop_multiplier("main.environment.Inflation", "inflation_mean")
+        # add_mean_inflation = self.get_prop_adder("main.environment.Inflation", "inflation_mean")
         multiply_stocks = self.get_prop_multiplier("assets.stocks.Stocks", "asset_value")
         multiply_gold = self.get_prop_multiplier("assets.resources.Gold", "asset_value")
 
@@ -164,19 +166,120 @@ class GreatRecession2007(EventModule):
         elif self.crisis_year == 4:  # 2009, crash
             multiply_prob_lose_job(2)
             multiply_prob_find_job(0.5)
-            add_mean_inflation(-inflation_mean_start-0.5)
+            multiply_mean_inflation(0.995/inflation_mean_start)
             multiply_stocks(0.5)
             multiply_gold(1.164)
         elif self.crisis_year == 5:  # 2010
-            add_mean_inflation(1)
+            multiply_mean_inflation(1.01/0.995)
             multiply_stocks(1.5)
             multiply_gold(1.164)
         else:  # reset
             multiply_prob_lose_job(0.5)
             multiply_prob_find_job(2)
-            add_mean_inflation(inflation_mean_start-0.5)
+            multiply_mean_inflation(inflation_mean_start/1.01)
             self.active = False
 
 
-class GreatDepression1929(EventModule):
-    pass
+class GermanHyperinflation1914(EventModule):
+    # TODO Test outcome: divided by inflation everything is the same
+    # TODO what happened to retail?
+    """
+    https://de.wikipedia.org/wiki/Deutsche_Inflation_1914_bis_1923
+    https://en.wikipedia.org/wiki/Hyperinflation_in_the_Weimar_Republic
+    http://www.hartwig-w.de/hartwig/ekh/19Jh-Lebenshaltung/1900-leben.htm
+    Hyperinflation
+
+    Inflation:
+    Paper money vs gold
+    1914: 1
+    1918: 2 (*2)
+    1919: 4 (*2)
+    1920: 10 (*2.5)
+    1921: 30 (*3)
+    1922: 200 (*6.66)
+    1923: 10000 (*50)
+    1924: 1,000,000,000,000 (*100000000)
+    currency reform
+        cash: 10,000,000,000 : 0.01
+        inflation: * 1/ 10,000,000,000
+
+    Stocks
+    https://de.wikipedia.org/wiki/Deutsche_Inflation_1914_bis_1923#/media/Datei:Aktienindex_des_Statistischen_Reichsamtes_in_Papiermark.png
+    1918: 100
+    1920: 100
+    1921: 200
+    1922: 1000
+    1923: 10000
+    1924: 20,000,000,000,000
+
+    Gold
+    https://upload.wikimedia.org/wikipedia/commons/7/7e/Goldpreis_in_Papiermark.png
+    1918: 100
+    1919: 150
+    1920: 1000
+    1921: 1000
+    1922: 3000
+    1923: 120,000
+    1924:  100,000,000,000,000
+
+    work:
+    https://www.was-war-wann.de/historische_werte/monatslohn.html
+    unemployment rate is low
+    wages:
+    # 1914: 90
+    # 1915: 91 (*1.01)
+    # 1916: 103 (*1.13)
+    # 1917: 119 (*1.15)
+    1918: 122 (*1.025)
+    1919: 127 (*1.04)
+    1920: 132 (*1.04)
+    1921: 136 (*1.03)
+    1922: 137 (*1.01)
+    1923: 120RM (*0.88 * 1,000,000,000,000)
+    1924: 122RM (*1.02)
+    """
+
+    def next_year(self):
+        multiply_salary_increase = self.get_prop_multiplier("main.work.Job", "salary_increase")
+        multiply_mean_inflation = self.get_prop_multiplier("main.environment.Inflation", "inflation_mean")
+        multiply_stocks = self.get_prop_multiplier("assets.stocks.Stocks", "asset_value")
+        multiply_gold = self.get_prop_multiplier("assets.resources.Gold", "asset_value")
+        multiply_current_account = self.get_prop_multiplier("CurrentAccount", "money_value")
+
+        if self.crisis_year == 0:  # 1919
+            multiply_mean_inflation(2/1.02)
+            multiply_gold(150/100)
+            multiply_salary_increase(1.04/2.)
+        elif self.crisis_year == 1:  # 1920
+            multiply_mean_inflation(2.5/2.)
+            multiply_gold(1000/150)
+            multiply_salary_increase(2./2.5)
+        elif self.crisis_year == 2:  # 1921
+            multiply_mean_inflation(3./2.5)
+            multiply_stocks(2)
+            multiply_salary_increase(2.5/3)
+        elif self.crisis_year == 3:  # 1922
+            multiply_mean_inflation(6.5/3.)
+            multiply_gold(3)
+            multiply_stocks(5)
+            multiply_salary_increase(1.01/1.04*3./6.5)
+        elif self.crisis_year == 4:  # 1923
+            multiply_mean_inflation(50./6.5)
+            multiply_gold(40)  # TODO gold had to be sold! if above limit of 10 gold mark
+            multiply_stocks(10)
+            multiply_salary_increase(0.88/1.01*6.5/50)
+        elif self.crisis_year == 5:  # 1924
+            multiply_mean_inflation(1e8/50)
+            multiply_gold(10000000000/12)
+            multiply_stocks(2000000000)
+            multiply_salary_increase(1.02/0.88 * 50/1e8)
+        elif self.crisis_year == 6:  # 1925 money reform
+            multiply_mean_inflation(2e-20)  # hack factor 1/2 because missing first years 1914-1918
+            multiply_gold(1e-12)
+            multiply_stocks(1e-12)
+            multiply_current_account(1e-12)
+            multiply_salary_increase(1/1.02 * 1/2e-20)
+        else:
+            multiply_mean_inflation(0.5*1.02e12)
+            multiply_salary_increase(2e-12)
+            self.active = False

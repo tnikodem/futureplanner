@@ -76,7 +76,7 @@ def get_sorted_module_blueprints(config):
 def get_start_values(config):
     config = copy.deepcopy(config)
     config["simulation"]["random"] = False
-    config["modules"]["main.environment.Inflation"]["inflation_mean"] = 0
+    config["modules"]["main.environment.Inflation"]["inflation_mean"] = 1
 
     sorted_module_blueprints = get_sorted_module_blueprints(config=config)
     profile_blueprint = get_blueprint(config=config["profile"], root_module=fup.profiles)
