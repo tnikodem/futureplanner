@@ -3,19 +3,19 @@ from fup.core.module import ChangeModule
 
 
 class Job(ChangeModule):
-    # TODO
-    # income increase till age of ~50, then decline  https://www.stepstone.de/gehaltspotenzial-rechner
-    # How much does it costs to find a new job?
-    # - Movement ?
-    # - Lower salary?
-    # - Compensation
+    """
+    TODO How much does it costs/earn to find a new job?
+    - Movement ?
+    - Lower/higher salary ?
+    - Compensation
+    """
 
     def __init__(self, start_income, prob_find_job, prob_lose_job, unemployed_months=0,
-                 salary_increase=1, name="", manager=None, **kwargs):
+                 salary_increase_mod=1, name="", manager=None, **kwargs):
         super().__init__(name=name, manager=manager, **kwargs)
 
         self.salary_per_month = start_income / 12
-        self.salary_increase = salary_increase
+        self.salary_increase_mod = salary_increase_mod
 
         self.prob_find_job = prob_find_job
         self.prob_lose_job = prob_lose_job
@@ -23,9 +23,25 @@ class Job(ChangeModule):
         self.unemployed_months = unemployed_months
         self.unemployed_months_this_year = 0
 
+    def get_age_salary_increase(self):
+        """
+        income increase https://www.stepstone.de/gehaltspotenzial-rechner
+        years: gross income (average germany)
+        22: 32,000
+        50: 60,000
+        65: 54,000
+
+        IMPORTANT: such big increases are only possible by changing jobs!
+        """
+        age = self.manager.year - self.manager.profile.birth_year
+        if age < 50:
+            return 1.0227
+        else:
+            return 0.993
+
     def next_year(self):
         inflation = self.get_prop("main.environment.Inflation", "inflation")
-        self.salary_per_month *= self.salary_increase * inflation
+        self.salary_per_month *= inflation * self.salary_increase_mod * self.get_age_salary_increase()
 
         if self.manager.profile.retired:
             self.unemployed_months_this_year = 0

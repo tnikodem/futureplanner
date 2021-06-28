@@ -16,7 +16,7 @@ def default_config():
         },
         "profile": {
             "class": "profiles.profiles.FullInvestment",
-            "birth_year": 2000,
+            "birth_year": 1955,
             "retirement_year": 2010,
         },
     }

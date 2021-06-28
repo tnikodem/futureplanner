@@ -240,7 +240,7 @@ class GermanHyperinflation1914(EventModule):
     """
 
     def next_year(self):
-        multiply_salary_increase = self.get_prop_multiplier("main.work.Job", "salary_increase")
+        multiply_salary_increase = self.get_prop_multiplier("main.work.Job", "salary_increase_mod")
         multiply_mean_inflation = self.get_prop_multiplier("main.environment.Inflation", "inflation_mean")
         multiply_stocks = self.get_prop_multiplier("assets.stocks.Stocks", "asset_value")
         multiply_gold = self.get_prop_multiplier("assets.resources.Gold", "asset_value")

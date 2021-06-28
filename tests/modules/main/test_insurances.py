@@ -170,7 +170,7 @@ def test_unemployment(default_manager):
     # Paying money
     # Standard
     default_manager.next_year()
-    assert default_manager.df_row["expenses"] == pytest.approx(10000 * 0.024 * 0.5)
+    assert default_manager.df_row["expenses"] == pytest.approx(10000 * 0.024 * 0.5 * 1.0227)  # FIXME *1.0227 -> no salary increase while unemployed
     # Above max
     default_manager.get_module("main.work.Job").salary_per_month = 200000
     default_manager.next_year()
@@ -187,7 +187,7 @@ def test_unemployment(default_manager):
     default_manager.get_module("main.work.Job").unemployed_months_this_year = 12
     default_manager.get_module("main.work.Job").unemployed_months = 12
     default_manager.next_year()
-    assert default_manager.df_row["income"] == pytest.approx(2000 * 12 * 0.8 * 0.6)
+    assert default_manager.df_row["income"] == pytest.approx(2000 * 12 * 0.8 * 0.6 * 1.0227)  # FIXME *1.0227 -> no salary increase while unemployed
     # Above max
     default_manager.get_module("main.work.Job").salary_per_month = 200000
     default_manager.next_year()

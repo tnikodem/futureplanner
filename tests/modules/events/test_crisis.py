@@ -56,9 +56,9 @@ def test_german_hyperinflation_1914(default_manager):
     assert df["gold_asset_value"].max() == pytest.approx(1e12)
     assert df["gold_asset_value"].values[-1] == pytest.approx(1, 1e-3)  # no loss in gold
 
-    assert df["total_assets"].values[-1] == pytest.approx(6.1e4, 1e-2)  # about two normal salaries after crisis
+    assert df["total_assets"].values[-1] == pytest.approx(6.49e4, 1e-2)  # about two normal salaries after crisis
 
-    assert manager.get_module("main.work.Job").salary_increase == pytest.approx(1)
+    assert manager.get_module("main.work.Job").salary_increase_mod == pytest.approx(1)
     assert df["income"].values[-1] == pytest.approx(30000, 1)  # about same salary as before crisis
 
     assert df["expenses"].values[-1] == pytest.approx(1000 * 1.02, 1e-2)  # about same expenses as before crisis
