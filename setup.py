@@ -12,7 +12,7 @@ with io.open('fup/__init__.py', 'rt', encoding='utf8') as f:
 
 setup(
     name='FuturePlanner',
-    version="0.0.0",
+    version="0.1.0",
     license='MIT',
     author='Thomas Nikodem',
     description='Plan the future of your money',
