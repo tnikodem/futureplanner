@@ -25,7 +25,7 @@ setup(
     install_requires=[
         'numpy>=1.20,<1.22',
         'pandas>=1.2,<1.4',
-        'bokeh==2.3.*',
+        'bokeh>=2.3,<2.5',
         'ruamel.yaml>=0.16,<0.18',
         'networkx==2.5.*'
     ],
