@@ -23,7 +23,7 @@ setup(
     platforms='any',
     python_requires='>=3.9',
     install_requires=[
-        'numpy>=1.20,<1.22',
+        'numpy>=1.20,<1.23',
         'pandas>=1.2,<1.5',
         'bokeh>=2.3,<2.5',
         'ruamel.yaml>=0.16,<0.18',
@@ -32,7 +32,7 @@ setup(
     extras_require={
         'dev': [
             'flake8==3.9.2',
-            'pytest==6.2.4',
+            'pytest==7.1.1',
             'pytest-cov==2.12.1'
         ]
     },
