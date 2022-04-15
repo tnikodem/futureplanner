@@ -33,7 +33,7 @@ setup(
         'dev': [
             'flake8==3.9.2',
             'pytest==7.1.1',
-            'pytest-cov==2.12.1'
+            'pytest-cov==3.0.0'
         ]
     },
     # entry_points={
