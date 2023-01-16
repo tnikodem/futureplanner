@@ -32,7 +32,7 @@ setup(
     extras_require={
         'dev': [
             'flake8==4.0.1',
-            'pytest==7.1.2',
+            'pytest==7.2.1',
             'pytest-cov==3.0.0'
         ]
     },
